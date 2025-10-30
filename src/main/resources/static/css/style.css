@@ -1198,6 +1198,41 @@ footer {
   word-break: break-word
 }
 
+/* Post content responsive media */
+.post-content img {
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+}
+.post-content video,
+.post-content iframe {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.post-content .resizable-media,
+.post-content .resizable-video,
+.post-content .kmap {
+  max-width: 100%;
+  width: 100% !important;
+}
+.post-content .resizable-map {
+  width: 100% !important;
+  min-height: 240px;
+}
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+}
+.post-content table td,
+.post-content table th {
+  border: 1px solid #e5e7eb;
+  padding: 8px;
+}
+
 .post-actions {
   display: flex;
   justify-content: space-between;
@@ -1589,6 +1624,35 @@ footer {
   gap: 6px;
   font-size: 13px;
   color: #999
+}
+
+/* Responsive tweaks for detail view */
+@media (max-width: 768px) {
+  .post-detail {
+    padding: 20px;
+  }
+  .post-title {
+    font-size: 26px;
+  }
+  .post-meta-info {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .related-post-card {
+    gap: 10px;
+  }
+  .related-post-thumbnail {
+    width: 64px;
+    height: 64px;
+  }
+}
+@media (max-width: 480px) {
+  .post-title {
+    font-size: 22px;
+  }
+  .post-content .resizable-map {
+    min-height: 220px;
+  }
 }
 
 .related-post-meta .dot {

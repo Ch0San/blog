@@ -20,6 +20,7 @@
 const fileInput = document.getElementById('imageFiles');
 const previewList = document.getElementById('imagePreviewList');
 const thumbnailPreview = document.getElementById('thumbnailPreview');
+const thumbnailFileInput = document.getElementById('thumbnailFileInput');
 const tbImage = document.getElementById('tb-image');
 const tbVideo = document.getElementById('tb-video');
 const tbMap = document.getElementById('tb-map');
@@ -94,6 +95,12 @@ preview.addEventListener('mouseover', (e) => {
             const thumbnailInput = document.getElementById('thumbnailUrl');
             if (thumbnailInput) {
                 thumbnailInput.value = img.src;
+                // URL로 썸네일 지정 시: 파일 입력 비우고 삭제 체크 해제
+                try {
+                    if (thumbnailFileInput) thumbnailFileInput.value = '';
+                    const deleteThumbnailCheckbox = document.getElementById('deleteThumbnail');
+                    if (deleteThumbnailCheckbox) deleteThumbnailCheckbox.checked = false;
+                } catch (_) {}
                 // 미리보기 갱신
                 try {
                     const previewBox = document.getElementById('thumbnailPreview');
@@ -168,7 +175,7 @@ if (fileInput) {
     });
 }
 
-// 썸네일 이미지 미리보기
+// 썸네일 이미지 미리보기 (썸네일 파일 교체 시 동작)
 if (thumbnailFileInput) {
     thumbnailFileInput.addEventListener('change', function () {
         const deleteThumbnailCheckbox = document.getElementById('deleteThumbnail');
@@ -189,6 +196,10 @@ if (thumbnailFileInput) {
             this.value = '';
             return;
         }
+
+        // URL 기반 썸네일을 사용 중이었다면 초기화
+        const thumbnailInput = document.getElementById('thumbnailUrl');
+        if (thumbnailInput) thumbnailInput.value = '';
 
         // 미리보기 표시
         const previewContainer = document.createElement('div');
@@ -232,7 +243,10 @@ if (deleteThumbnailCheckbox) {
                 currentThumbnail.appendChild(overlay);
             }
             // 파일 선택 초기화
-            thumbnailFileInput.value = '';
+            if (thumbnailFileInput) thumbnailFileInput.value = '';
+            // URL 기반 썸네일도 해제
+            const thumbnailInput = document.getElementById('thumbnailUrl');
+            if (thumbnailInput) thumbnailInput.value = '';
         } else {
             // 체크 해제하면 원래대로
             if (currentThumbnail) {
@@ -243,6 +257,18 @@ if (deleteThumbnailCheckbox) {
         }
     });
 }
+
+// 폼 제출 직전: 본문 HTML 동기화 보강 (혹시 누락 방지)
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('form.editor-form');
+    if (form) {
+        form.addEventListener('submit', () => {
+            if (preview && textarea) {
+                textarea.value = preview.innerHTML;
+            }
+        });
+    }
+});
 
 const el = {
     title: document.getElementById('title'),

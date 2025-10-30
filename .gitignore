@@ -32,7 +32,8 @@ build/
 ### VS Code ###
 .vscode/
 
-# Runtime uploads (served by ResourceHandler)
+### Runtime uploads (served by ResourceHandler)
+# 기본적으로 업로드된 파일들은 커밋하지 않는다
 uploads/
 !uploads/.gitkeep
 !uploads/**/.gitkeep

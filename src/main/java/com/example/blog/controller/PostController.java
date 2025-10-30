@@ -232,8 +232,10 @@ public class PostController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String tags,
             @RequestParam(required = false) MultipartFile thumbnailFile,
+            @RequestParam(name = "thumbnailUrl", required = false) String thumbnailUrlParam,
             @RequestParam(required = false) String videoUrl,
             @RequestParam(value = "imageFiles", required = false) java.util.List<MultipartFile> imageFiles,
+            @RequestParam(value = "files", required = false) java.util.List<MultipartFile> files,
             @RequestParam(value = "imageUrls", required = false) String imageUrls,
             @RequestParam(required = false, defaultValue = "false") boolean isPublic,
             HttpSession session) {
@@ -244,10 +246,13 @@ public class PostController {
         post.setCategory(category);
         post.setTags(tags);
 
-        // 썸네일 이미지 업로드 처리
-        String thumbnailUrl = null;
+
+        // 썸네일 결정: 업로드 파일 > 클라이언트 선택 URL(hidden input)
+        String chosenThumbnail = null;
         if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
-            thumbnailUrl = saveThumbnailFile(thumbnailFile);
+            chosenThumbnail = saveThumbnailFile(thumbnailFile);
+        } else if (thumbnailUrlParam != null && !thumbnailUrlParam.isBlank()) {
+            chosenThumbnail = normalizeWebPath(thumbnailUrlParam);
         }
 
         // 다중 이미지 업로드(각 10MB 이하). 첫 이미지로 대표 섬네일 설정, 나머지는 PostImage로 저장
@@ -256,6 +261,7 @@ public class PostController {
             java.nio.file.Files.createDirectories(uploadRoot);
 
             java.util.List<String> savedPaths = new java.util.ArrayList<>();
+            java.util.List<String> savedFilePaths = new java.util.ArrayList<>();
             if (imageFiles != null) {
                 int idx = 0;
                 for (MultipartFile file : imageFiles) {
@@ -284,11 +290,36 @@ public class PostController {
                     post.getImages().add(pi);
                 }
             }
+            // 일반 파일 업로드 -> uploads/files 저장 후 콤마로 files_url에 저장
+            if (files != null) {
+                java.nio.file.Path filesRoot = java.nio.file.Paths.get("uploads", "files");
+                java.nio.file.Files.createDirectories(filesRoot);
+                for (MultipartFile f : files) {
+                    if (f == null || f.isEmpty()) continue;
+                    if (f.getSize() > 10L * 1024 * 1024) {
+                        return "redirect:/posts/write?error=FILE_TOO_LARGE";
+                    }
+                    String original = f.getOriginalFilename();
+                    String ext = (original != null && original.contains("."))
+                            ? original.substring(original.lastIndexOf('.'))
+                            : "";
+                    String filename = java.time.LocalDate.now() + "-" + java.util.UUID.randomUUID() + ext;
+                    java.nio.file.Path target = filesRoot.resolve(filename);
+                    try (java.io.InputStream in = f.getInputStream()) {
+                        java.nio.file.Files.copy(in, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    }
+                    String webPath = "/uploads/files/" + filename;
+                    savedFilePaths.add(webPath);
+                }
+                if (!savedFilePaths.isEmpty()) {
+                    post.setFilesUrl(String.join(",", savedFilePaths));
+                }
+            }
             // imageUrls는 본문에 삽입된 이미지이므로 PostImage에 추가하지 않음 (첨부파일 아님)
 
             // 대표 이미지 설정: 썸네일 파일 > 첫 번째 첨부 이미지 순서
-            if (thumbnailUrl != null) {
-                post.setThumbnailUrl(thumbnailUrl);
+            if (chosenThumbnail != null && !chosenThumbnail.isBlank()) {
+                post.setThumbnailUrl(chosenThumbnail);
             } else if (!savedPaths.isEmpty()) {
                 post.setThumbnailUrl(savedPaths.get(0));
             }
@@ -328,7 +359,10 @@ public class PostController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String tags,
             @RequestParam(required = false) MultipartFile thumbnailFile,
+            @RequestParam(name = "thumbnailUrl", required = false) String thumbnailUrlParam,
             @RequestParam(required = false) Boolean deleteThumbnail,
+            @RequestParam(value = "deleteImageIds", required = false) java.util.List<Long> deleteImageIds,
+            @RequestParam(value = "files", required = false) java.util.List<MultipartFile> files,
             @RequestParam(value = "imageFiles", required = false) java.util.List<MultipartFile> imageFiles,
             @RequestParam(value = "imageUrls", required = false) String imageUrls,
             @RequestParam(required = false, defaultValue = "false") boolean isPublic,
@@ -356,8 +390,13 @@ public class PostController {
             String existingThumbnail = post.getThumbnailUrl();
             deleteImageFileByUrl(existingThumbnail);
 
-            String thumbnailUrl = saveThumbnailFile(thumbnailFile);
-            post.setThumbnailUrl(thumbnailUrl);
+            String newThumb = saveThumbnailFile(thumbnailFile);
+            post.setThumbnailUrl(newThumb);
+        }
+        else if (thumbnailUrlParam != null && !thumbnailUrlParam.isBlank()) {
+            String existingThumbnail = post.getThumbnailUrl();
+            deleteImageFileByUrl(existingThumbnail);
+            post.setThumbnailUrl(normalizeWebPath(thumbnailUrlParam));
         }
 
         // 새로운 이미지 업로드 처리
@@ -366,6 +405,7 @@ public class PostController {
             java.nio.file.Files.createDirectories(uploadRoot);
 
             java.util.List<String> savedPaths = new java.util.ArrayList<>();
+            java.util.List<String> savedFilePaths = new java.util.ArrayList<>();
 
             // 기존 이미지 개수 확인
             int startIdx = post.getImages() != null ? post.getImages().size() : 0;
@@ -399,10 +439,41 @@ public class PostController {
                 }
             }
 
+            // 일반 파일 업로드 (uploads/files) -> 기존 값에 추가
+            if (files != null) {
+                java.nio.file.Path filesRoot = java.nio.file.Paths.get("uploads", "files");
+                java.nio.file.Files.createDirectories(filesRoot);
+                for (MultipartFile f : files) {
+                    if (f == null || f.isEmpty()) continue;
+                    if (f.getSize() > 10L * 1024 * 1024) {
+                        return "redirect:/posts/edit/" + id + "?error=FILE_TOO_LARGE";
+                    }
+                    String original = f.getOriginalFilename();
+                    String ext = (original != null && original.contains("."))
+                            ? original.substring(original.lastIndexOf('.'))
+                            : "";
+                    String filename = java.time.LocalDate.now() + "-" + java.util.UUID.randomUUID() + ext;
+                    java.nio.file.Path target = filesRoot.resolve(filename);
+                    try (java.io.InputStream in = f.getInputStream()) {
+                        java.nio.file.Files.copy(in, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    }
+                    String webPath = "/uploads/files/" + filename;
+                    savedFilePaths.add(webPath);
+                }
+                if (!savedFilePaths.isEmpty()) {
+                    String existing = post.getFilesUrl();
+                    post.setFilesUrl(existing == null || existing.isBlank()
+                            ? String.join(",", savedFilePaths)
+                            : existing + "," + String.join(",", savedFilePaths));
+                }
+            }
+
             // imageUrls는 본문에 삽입된 이미지이므로 PostImage에 추가하지 않음 (첨부파일 아님)
 
             // 썸네일이 삭제되었고 새 첨부 이미지가 있으면 첫 번째 이미지를 썸네일로
-            if (Boolean.TRUE.equals(deleteThumbnail) && !savedPaths.isEmpty()) {
+            if (!Boolean.TRUE.equals(deleteThumbnail)
+                    && (post.getThumbnailUrl() == null || post.getThumbnailUrl().isBlank())
+                    && !savedPaths.isEmpty()) {
                 post.setThumbnailUrl(savedPaths.get(0));
             }
 
@@ -468,6 +539,39 @@ public class PostController {
                             "attachment; filename=\"" + originalFilename + "\"")
                     .body(resource);
 
+        } catch (MalformedURLException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 파일 다운로드 (uploads/files)
+    @GetMapping("/posts/file/download")
+    public ResponseEntity<Resource> downloadAttachment(@RequestParam String filename) {
+        try {
+            Path uploadPath = Paths.get("uploads/files").toAbsolutePath().normalize();
+            Path filePath = uploadPath.resolve(filename).normalize();
+            if (!filePath.startsWith(uploadPath)) {
+                return ResponseEntity.badRequest().build();
+            }
+            Resource resource = new UrlResource(filePath.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                return ResponseEntity.notFound().build();
+            }
+            String contentType = Files.probeContentType(filePath);
+            if (contentType == null) contentType = "application/octet-stream";
+            String originalFilename = filename;
+            if (filename.contains("-") && filename.length() > 36) {
+                int lastDashIndex = filename.lastIndexOf('-');
+                if (lastDashIndex > 0) {
+                    originalFilename = filename.substring(lastDashIndex + 1);
+                }
+            }
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + originalFilename + "\"")
+                    .body(resource);
         } catch (MalformedURLException e) {
             return ResponseEntity.badRequest().build();
         } catch (IOException e) {

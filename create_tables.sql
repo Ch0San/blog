@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS posts (
     is_public BOOLEAN DEFAULT TRUE COMMENT '게시글 공개 여부',
     thumbnail_url VARCHAR(500) COMMENT '썸네일 이미지 URL',
     video_url VARCHAR(500) COMMENT '동영상 URL',
+    files_url TEXT COMMENT '첨부 파일 경로 (쉼표로 구분, /uploads/files 하위 경로)',
     category VARCHAR(50) COMMENT '게시글 카테고리',
     tags VARCHAR(500) COMMENT '게시글 태그 (쉼표로 구분)',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '작성일시',

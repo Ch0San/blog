@@ -58,6 +58,9 @@ public class Post {
     @Column(name = "video_url")
     private String videoUrl;
 
+    @Column(name = "files_url")
+    private String filesUrl;
+
     /** 게시글 카테고리 */
     @Column(name = "category")
     private String category;

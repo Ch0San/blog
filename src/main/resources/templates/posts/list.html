@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>게시글 목록</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
@@ -20,6 +21,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
             <div style="display:flex;align-items:center;gap:20px">
                 <h1 style="margin:0;color:var(--text)">포스트</h1>
+
                 <!-- 카테고리 탭 -->
                 <div class="category-tabs">
                     <a th:href="@{/posts}" th:classappend="${currentCategory == null ? 'active' : ''}"
@@ -44,55 +46,132 @@
                     </a>
                 </div>
             </div>
+
             <a sec:authorize="hasRole('ADMIN')" href="/posts/write"
                 style="background:var(--accent);color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:500;transition:opacity 0.2s"
-                onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">글쓰기</a>
+                onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                글쓰기
+            </a>
         </div>
 
+        <!-- 빈 상태 -->
         <div th:if="${#lists.isEmpty(posts)}" class="empty-state">
             <p style="font-size:1.1em">게시글이 없습니다.</p>
         </div>
 
-        <div th:each="post : ${posts}" class="post-item" style="display:flex;gap:20px;align-items:flex-start">
-            <div style="flex:1">
-                <div class="title"><a th:href="@{'/posts/' + ${post.id}}" th:text="${post.title}">제목</a></div>
-                <div class="meta"><span th:text="${post.author}">author</span> · <span
-                        th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">date</span></div>
-                <div class="excerpt">
-                    <span
-                        th:text="${#strings.length(post.content) > 150 ? #strings.substring(post.content, 0, 150) + '...' : post.content}">내용
-                        미리보기</span>
+        <!-- 게시글 목록 -->
+        <div th:each="post : ${posts}" class="post-item"
+            style="display:flex;gap:20px;align-items:flex-start;margin-bottom:24px">
+
+            <!-- 왼쪽 텍스트 영역 -->
+            <div style="flex:1;min-width:0;">
+                <!-- 제목 -->
+                <div class="title"
+                    style="font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.4;">
+                    <a th:href="@{'/posts/' + ${post.id}}" th:text="${post.title}"
+                        style="color:inherit;text-decoration:none;word-break:break-word;">
+                        제목
+                    </a>
+                </div>
+
+                <!-- 메타 (작성자 · 날짜) -->
+                <div class="meta"
+                    style="color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
+                    <span th:text="${post.author}">author</span>
+                    <span>·</span>
+                    <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">date</span>
+                </div>
+
+                <!-- 본문 요약 -->
+                <div class="excerpt" style="color:#4b5563;font-size:14px;line-height:1.5;word-break:break-word;">
+                    <span th:text="${#strings.length(post.content) > 150
+                                    ? #strings.substring(post.content, 0, 150) + '...'
+                                    : post.content}">
+                        내용 미리보기
+                    </span>
                 </div>
             </div>
-            <!-- 썸네일 이미지 -->
-            <div style="width:180px;height:120px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#f5f5f5">
-                <img th:if="${post.thumbnailUrl != null && !#strings.isEmpty(post.thumbnailUrl)}"
-                    th:src="${post.thumbnailUrl}" alt="썸네일" style="width:100%;height:100%;object-fit:cover"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div th:unless="${post.thumbnailUrl != null && !#strings.isEmpty(post.thumbnailUrl)}"
-                    style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;font-size:14px;font-weight:500"
-                    th:text="${post.category != null ? post.category : '포스트'}">
+
+            <!-- 오른쪽 썸네일 영역 -->
+            <div style="
+                width:180px;
+                height:120px;
+                flex-shrink:0;
+                border-radius:8px;
+                overflow:hidden;
+                background:#f5f5f5;
+                position:relative;
+            ">
+
+                <!-- 썸네일 URL이 있을 때만 이미지 태그 렌더링하여 불필요한 요청 차단 -->
+                <img th:if="${post.thumbnailUrl != null and !#strings.isEmpty(post.thumbnailUrl)}"
+                     style="width:100%;height:100%;object-fit:cover;display:block;"
+                     th:src="${post.thumbnailUrl}"
+                     alt="썸네일"
+                     onerror="
+                        this.style.display='none';
+                        var fb=this.parentNode.querySelector('.thumb-fallback');
+                        if(fb){ fb.style.display='flex'; }
+                     ">
+
+                <div class="thumb-fallback" style="
+                        position:absolute;
+                        inset:0;
+                        width:100%;
+                        height:100%;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+                        color:#fff;
+                        font-size:14px;
+                        font-weight:500;
+                        text-align:center;
+                        padding:8px;
+                        box-sizing:border-box;
+                        word-break:keep-all;
+                     " th:text="${post.category != null ? post.category : '포스트'}"
+                     th:if="${post.thumbnailUrl == null or #strings.isEmpty(post.thumbnailUrl)}">
                     포스트
                 </div>
             </div>
         </div>
 
-        <div class="pagination" th:if="${page.totalPages} > 1">
-            <a th:if="${!page.first}"
-                th:href="${searchField} != null ? @{/posts/search(page=${page.number - 1}, field=${searchField}, q=${searchQuery})} : @{/posts(page=${page.number - 1}, category=${currentCategory})}">&laquo;
-                이전</a>
-            <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
-                <a th:if="${i != page.number}"
-                    th:href="${searchField} != null ? @{/posts/search(page=${i}, field=${searchField}, q=${searchQuery})} : @{/posts(page=${i}, category=${currentCategory})}"
-                    th:text="${i + 1}">1</a>
-                <span th:if="${i == page.number}" class="current" th:text="${i + 1}">1</span>
+        <!-- 페이지네이션 -->
+        <div class="pagination" th:if="${page.totalPages} > 1" style="margin-top:40px">
+            <a th:if="${!page.first}" th:href="${
+                    searchField} != null ?
+                    @{/posts/search(page=${page.number - 1}, field=${searchField}, q=${searchQuery})} :
+                    @{/posts(page=${page.number - 1}, category=${currentCategory})}"
+                style="margin-right:8px;text-decoration:none;color:var(--text);font-size:14px;">
+                &laquo; 이전
+            </a>
+
+            <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}" style="margin:0 4px;">
+                <a th:if="${i != page.number}" th:href="${
+                        searchField} != null ?
+                        @{/posts/search(page=${i}, field=${searchField}, q=${searchQuery})} :
+                        @{/posts(page=${i}, category=${currentCategory})}" th:text="${i + 1}"
+                    style="text-decoration:none;color:var(--text);font-size:14px;padding:2px 6px;border-radius:4px;display:inline-block;">
+                    1
+                </a>
+                <span th:if="${i == page.number}" class="current" th:text="${i + 1}"
+                    style="background:var(--accent);color:#fff;font-size:14px;padding:2px 6px;border-radius:4px;display:inline-block;">
+                    1
+                </span>
             </span>
-            <a th:if="${!page.last}"
-                th:href="${searchField} != null ? @{/posts/search(page=${page.number + 1}, field=${searchField}, q=${searchQuery})} : @{/posts(page=${page.number + 1}, category=${currentCategory})}">다음
-                &raquo;</a>
+
+            <a th:if="${!page.last}" th:href="${
+                    searchField} != null ?
+                    @{/posts/search(page=${page.number + 1}, field=${searchField}, q=${searchQuery})} :
+                    @{/posts(page=${page.number + 1}, category=${currentCategory})}"
+                style="margin-left:8px;text-decoration:none;color:var(--text);font-size:14px;">
+                다음 &raquo;
+            </a>
         </div>
 
     </main>
+
     <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 

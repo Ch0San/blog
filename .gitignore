@@ -34,3 +34,5 @@ build/
 
 # Runtime uploads (served by ResourceHandler)
 uploads/
+!uploads/.gitkeep
+!uploads/**/.gitkeep

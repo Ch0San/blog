@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>로그인</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+
+<body>
+    <!-- 공통 헤더 import -->
+    <div th:replace="~{fragments/header :: header('home')}"></div>
+
+    <main class="container" style="padding-top:28px;padding-bottom:40px">
+        <div class="write-form" style="max-width:500px">
+            <h1 style="margin-top:0;margin-bottom:10px;color:var(--text)">로그인</h1>
+            <p style="margin-bottom:30px;color:var(--muted);font-size:14px">계정에 로그인하세요</p>
+
+            <!-- 로그인 실패 메시지 -->
+            <div th:if="${param.error}"
+                style="background:#fff1f0;border:1px solid #ffccc7;color:#cf1322;padding:12px;border-radius:6px;margin-bottom:20px;font-size:14px">
+                아이디 또는 비밀번호가 올바르지 않습니다.
+            </div>
+
+            <!-- 로그아웃 메시지 -->
+            <div th:if="${param.logout}"
+                style="background:#f0f9ff;border:1px solid #bae7ff;color:#0958d9;padding:12px;border-radius:6px;margin-bottom:20px;font-size:14px">
+                로그아웃되었습니다.
+            </div>
+
+            <!-- 비밀번호 재설정 성공 메시지 -->
+            <div th:if="${param.passwordReset}"
+                style="background:#f6ffed;border:1px solid #b7eb8f;color:#389e0d;padding:12px;border-radius:6px;margin-bottom:20px;font-size:14px">
+                비밀번호가 성공적으로 변경되었습니다. 새 비밀번호로 로그인하세요.
+            </div>
+
+            <form th:action="@{/member/signin}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <div class="form-group">
+                    <label for="username">아이디 <span style="color:#ff4444">*</span></label>
+                    <input type="text" id="username" name="username" placeholder="아이디를 입력하세요" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">비밀번호 <span style="color:#ff4444">*</span></label>
+                    <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="remember-me" name="remember-me">
+                    <label for="remember-me" style="margin:0;font-weight:400">로그인 상태 유지</label>
+                </div>
+
+                <div class="form-actions" style="margin-top:24px">
+                    <a href="/" class="btn btn-secondary">취소</a>
+                    <button type="submit" class="btn btn-primary">로그인</button>
+                </div>
+            </form>
+
+            <div style="margin-top:24px;text-align:center;padding-top:24px;border-top:1px solid #e6e9ee">
+                <p style="color:var(--muted);font-size:14px;margin-bottom:12px">
+                    아직 계정이 없으신가요?
+                </p>
+                <a href="/member/signup" class="btn btn-primary" style="width:100%;text-align:center;padding:12px 24px">
+                    회원가입하기
+                </a>
+            </div>
+
+            <div style="margin-top:16px;text-align:center">
+                <div style="display:flex;gap:8px;justify-content:center;align-items:center">
+                    <a href="/member/find-id" style="color:var(--muted);font-size:13px;text-decoration:none">
+                        아이디 찾기
+                    </a>
+                    <span style="color:var(--muted)">|</span>
+                    <a href="/member/find-password" style="color:var(--muted);font-size:13px;text-decoration:none">
+                        비밀번호 찾기
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

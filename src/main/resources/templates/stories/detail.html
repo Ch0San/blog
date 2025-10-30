@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${story.title}">스토리 제목</title>
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <script th:src="@{/js/stories/detail.js}"></script>
+</head>
+
+<body>
+    <!-- 공통 헤더 import -->
+    <div th:replace="~{fragments/header :: header('stories')}"></div>
+
+    <main class="container" style="padding-top:28px;padding-bottom:40px">
+        <article class="post-detail">
+            <!-- 스토리 헤더 -->
+            <header class="post-header">
+                <div class="post-category" th:if="${story.category}" th:text="${story.category}">카테고리</div>
+                <h1 class="post-title" th:text="${story.title}">스토리 제목</h1>
+
+                <div class="post-meta-info">
+                    <span class="author" th:text="${story.author}">작성자</span>
+                    <span class="separator">·</span>
+                    <span class="date" th:text="${#temporals.format(story.createdAt, 'yyyy년 MM월 dd일')}">2025년 10월
+                        26일</span>
+                    <span class="separator">·</span>
+                    <span class="views">👁️ <span th:text="${story.viewCount}">0</span></span>
+                    <span class="separator">·</span>
+                    <span class="likes">❤️ <span id="storyLikeCount" th:text="${story.likeCount}">0</span></span>
+                    <!-- 스토리 좋아요 버튼 (로그인 사용자만) -->
+                    <span class="separator" sec:authorize="isAuthenticated()">·</span>
+                    <button type="button" id="storyLikeBtn" sec:authorize="isAuthenticated()"
+                        th:data-story-id="${story.id}" th:data-is-liked="${isStoryLiked}" class="btn-like"
+                        th:classappend="${isStoryLiked} ? 'liked' : ''"
+                        style="background:none;border:none;cursor:pointer;color:#e74c3c;font-size:14px">
+                        <span id="storyLikeBtnText" th:text="${isStoryLiked} ? '❤️ 좋아요 취소' : '🤍 좋아요'">🤍 좋아요</span>
+                    </button>
+                </div>
+
+                <!-- 태그 -->
+                <div class="post-tags" th:if="${story.tags != null and !#strings.isEmpty(story.tags)}">
+                    <span class="tag" th:each="tag : ${#strings.arraySplit(story.tags, ',')}" th:text="'#' + ${tag}">
+                        #태그
+                    </span>
+                </div>
+            </header>
+
+            <!-- 비디오 플레이어 (videoUrl이 있을 경우) -->
+            <div class="video-container" th:if="${story.videoUrl != null and !#strings.isEmpty(story.videoUrl)}"
+                style="width:100%;margin:24px 0;display:flex;justify-content:center">
+                <video controls style="max-width:100%;max-height:640px;display:block;border-radius:8px">
+                    <source th:src="@{${story.videoUrl}}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
+            <!-- 썸네일 이미지 (비디오가 없고 썸네일만 있을 경우) -->
+            <div class="post-thumbnail"
+                th:if="${story.thumbnailUrl != null and (story.videoUrl == null or #strings.isEmpty(story.videoUrl))}">
+                <img th:src="@{${story.thumbnailUrl}}" th:alt="${story.title}" />
+            </div>
+
+            <!-- 스토리 본문 -->
+            <div class="post-content" th:utext="${story.description}">
+                스토리 내용이 여기에 표시됩니다.
+            </div>
+
+            <!-- 스토리 액션 버튼 -->
+            <div class="post-actions">
+                <a href="/stories" class="btn btn-secondary">목록으로</a>
+                <div class="action-buttons" sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{'/stories/edit/' + ${story.id}}" class="btn btn-primary">수정</a>
+                    <form th:action="@{'/stories/delete/' + ${story.id}}" method="post" style="display:inline"
+                        onsubmit="return confirm('정말 삭제하시겠습니까?')">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-danger">삭제</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 댓글 영역 -->
+            <section class="comments-section">
+                <h3 class="comments-title">
+                    댓글 <span class="comment-count" th:text="${commentCount}">0</span>
+                </h3>
+
+                <!-- 댓글 없을 때 (작성 폼 위로 이동) -->
+                <div class="no-comments" th:if="${comments == null || comments.size() == 0}">
+                    <p>첫 댓글을 작성해보세요!</p>
+                </div>
+
+                <!-- 댓글 작성 폼 (로그인 사용자만) -->
+                <div class="comment-form-wrapper" sec:authorize="isAuthenticated()">
+                    <form class="comment-form" th:action="@{'/stories/' + ${story.id} + '/comments'}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <textarea name="content" placeholder="댓글을 입력하세요..." rows="3" required></textarea>
+                        <button type="submit" class="btn btn-primary">댓글 작성</button>
+                    </form>
+                </div>
+
+                <!-- 비로그인 시 안내 -->
+                <div class="login-notice" sec:authorize="!isAuthenticated()">
+                    <p>댓글을 작성하려면 <a href="/member/signin">로그인</a>이 필요합니다.</p>
+                </div>
+
+                <!-- 댓글 목록 -->
+                <div class="comments-list">
+                    <!-- 댓글 있을 때 -->
+                    <div class="comment-item" th:each="comment : ${comments}">
+                        <div class="comment-header">
+                            <span class="comment-author" th:text="${comment.author}">작성자 닉네임</span>
+                            <span class="comment-date"
+                                th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}">2025-10-26
+                                14:30</span>
+                        </div>
+
+                        <!-- 댓글 내용 (기본 표시) -->
+                        <div class="comment-content" th:id="'comment-content-' + ${comment.id}"
+                            th:text="${comment.content}">
+                            댓글 내용입니다.
+                        </div>
+
+                        <!-- 댓글 수정 폼 (숨김 상태) -->
+                        <div class="comment-edit-form" th:id="'comment-edit-form-' + ${comment.id}"
+                            style="display:none">
+                            <form th:action="@{'/stories/comments/' + ${comment.id} + '/update'}" method="post">
+                                <input type="hidden" name="storyId" th:value="${story.id}" />
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <textarea name="content" th:text="${comment.content}" rows="3" required
+                                    style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;resize:vertical"></textarea>
+                                <div style="margin-top:8px;display:flex;gap:8px">
+                                    <button type="submit" class="btn btn-primary"
+                                        style="font-size:13px;padding:6px 12px">저장</button>
+                                    <button type="button" class="btn btn-secondary"
+                                        style="font-size:13px;padding:6px 12px"
+                                        th:onclick="'cancelEdit(' + ${comment.id} + ')'">취소</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="comment-actions">
+                            <span class="comment-like">❤️ <span th:id="'story-comment-like-count-' + ${comment.id}"
+                                    th:text="${comment.likeCount}">0</span></span>
+                            <!-- 댓글 좋아요 버튼 (로그인 사용자만, AJAX) -->
+                            <button type="button" sec:authorize="isAuthenticated()" class="btn-story-comment-like"
+                                th:id="'story-comment-like-btn-' + ${comment.id}" th:data-comment-id="${comment.id}"
+                                th:data-is-liked="${likedCommentIds != null and likedCommentIds.contains(comment.id)}"
+                                style="background:none;border:none;cursor:pointer;color:#e74c3c;font-size:12px;margin-left:8px">
+                                <span th:id="'story-comment-like-text-' + ${comment.id}"
+                                    th:text="${likedCommentIds != null and likedCommentIds.contains(comment.id)} ? '좋아요 취소' : '좋아요'">
+                                    좋아요
+                                </span>
+                            </button>
+                            <!-- 본인 댓글 수정/삭제 버튼 (아이디 기준 비교) -->
+                            <span sec:authorize="isAuthenticated()"
+                                th:if="${#authentication.name == comment.authorUsername}">
+                                <button type="button" class="btn-edit-comment"
+                                    th:onclick="'editComment(' + ${comment.id} + ')'"
+                                    style="background:none;border:none;cursor:pointer;color:#888;font-size:12px;margin-left:8px">수정</button>
+                                <form th:action="@{'/stories/comments/' + ${comment.id} + '/delete'}" method="post"
+                                    style="display:inline" onsubmit="return confirm('댓글을 삭제하시겠습니까?')">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                    <input type="hidden" name="storyId" th:value="${story.id}" />
+                                    <button type="submit" class="btn-delete-comment"
+                                        style="background:none;border:none;cursor:pointer;color:#888;font-size:12px;margin-left:8px">삭제</button>
+                                </form>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </article>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

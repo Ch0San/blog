@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>공지사항</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+		rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/css/style.css}" />
+	<style>
+		/* 공지 목록 전용, 전역 오염 없도록 최소 범위 */
+		.notice-page .title a {
+			color: var(--text);
+			text-decoration: none
+		}
+
+		.notice-page .title a:hover {
+			color: var(--accent)
+		}
+	</style>
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header('home')}"></div>
+
+	<main class="container notice-page" style="padding-top:28px">
+		<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+			<h1 style="margin:0;color:var(--text)">공지사항</h1>
+			<a sec:authorize="hasRole('ADMIN')" href="/notice/write" class="btn btn-primary"
+				style="padding:10px 20px">공지 등록</a>
+		</div>
+
+		<div th:if="${#lists.isEmpty(notices)}" class="empty-state">
+			<p>등록된 공지사항이 없습니다.</p>
+		</div>
+
+		<div th:each="n : ${notices}" class="post-item" style="display:flex;gap:20px;align-items:flex-start">
+			<div style="flex:1">
+				<div class="title"><a th:href="@{'/notice/' + ${n.id}}" th:text="${n.title}">공지 제목</a></div>
+				<div class="meta"><span th:text="${n.author}">관리자</span> · <span
+						th:text="${#temporals.format(n.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span> · 조회 <span
+						th:text="${n.viewCount}">0</span></div>
+				<div class="excerpt"
+					th:text="${#strings.length(n.content) > 160 ? #strings.substring(n.content, 0, 160) + '...' : n.content}">
+					내용 미리보기</div>
+			</div>
+		</div>
+
+		<div class="pagination" th:if="${page.totalPages} > 1">
+			<a th:if="${!page.first}" th:href="@{/notice(page=${page.number - 1})}">&laquo; 이전</a>
+			<span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+				<a th:if="${i != page.number}" th:href="@{/notice(page=${i})}" th:text="${i + 1}">1</a>
+				<span th:if="${i == page.number}" class="current" th:text="${i + 1}">1</span>
+			</span>
+			<a th:if="${!page.last}" th:href="@{/notice(page=${page.number + 1})}">다음 &raquo;</a>
+		</div>
+
+	</main>
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

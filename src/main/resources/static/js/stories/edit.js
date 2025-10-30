@@ -1,0 +1,110 @@
+// stories/edit.html의 동영상/썸네일 미리보기 및 삭제 체크박스 기능
+document.addEventListener('DOMContentLoaded', function () {
+    const videoFileInput = document.getElementById('videoFile');
+    const videoPreview = document.getElementById('videoPreview');
+    const thumbnailFileInput = document.getElementById('thumbnailFile');
+    const thumbnailPreview = document.getElementById('thumbnailPreview');
+    const maxSize = 100 * 1024 * 1024; // 100MB
+
+    if (videoFileInput) {
+        videoFileInput.addEventListener('change', function () {
+            videoPreview.innerHTML = '';
+            const file = this.files[0];
+            if (!file) return;
+            // 파일 크기 체크
+            if (file.size > maxSize) {
+                alert('동영상 파일 크기가 100MB를 초과합니다.\n현재 파일 크기: ' + (file.size / 1024 / 1024).toFixed(2) + 'MB');
+                this.value = '';
+                return;
+            }
+            // 미리보기 표시
+            const previewContainer = document.createElement('div');
+            previewContainer.style.cssText = 'border:1px solid #e6e8eb;border-radius:6px;padding:10px;background:#f8f9fa';
+            const fileInfo = document.createElement('div');
+            fileInfo.innerHTML = `
+				<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+					<span style="font-size:20px">🎬</span>
+					<div>
+						<div style="font-weight:500;color:var(--text)">${file.name}</div>
+						<div style="font-size:12px;color:var(--muted)">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+					</div>
+				</div>
+			`;
+            // 동영상 미리보기 (URL.createObjectURL 사용)
+            const video = document.createElement('video');
+            video.controls = true;
+            video.style.cssText = 'width:100%;max-width:500px;border-radius:6px';
+            video.src = URL.createObjectURL(file);
+            previewContainer.appendChild(fileInfo);
+            previewContainer.appendChild(video);
+            videoPreview.appendChild(previewContainer);
+        });
+    }
+
+    if (thumbnailFileInput) {
+        thumbnailFileInput.addEventListener('change', function () {
+            const deleteThumbnailCheckbox = document.getElementById('deleteThumbnail');
+            const file = this.files[0];
+            if (!file) return;
+            // 새 파일을 선택하면 삭제 체크박스 자동 해제
+            if (deleteThumbnailCheckbox) {
+                deleteThumbnailCheckbox.checked = false;
+            }
+            thumbnailPreview.innerHTML = '';
+            // 파일 크기 체크 (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('이미지 파일 크기가 10MB를 초과합니다.\n현재 파일 크기: ' + (file.size / 1024 / 1024).toFixed(2) + 'MB');
+                this.value = '';
+                return;
+            }
+            // 미리보기 표시
+            const previewContainer = document.createElement('div');
+            previewContainer.style.cssText = 'border:1px solid #e6e8eb;border-radius:6px;padding:10px;background:#f8f9fa';
+            const fileInfo = document.createElement('div');
+            fileInfo.innerHTML = `
+				<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+					<span style="font-size:20px">🖼️</span>
+					<div>
+						<div style="font-weight:500;color:var(--text)">${file.name}</div>
+						<div style="font-size:12px;color:var(--muted)">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+					</div>
+				</div>
+			`;
+            // 이미지 미리보기
+            const img = document.createElement('img');
+            img.style.cssText = 'width:100%;max-width:400px;border-radius:6px';
+            img.src = URL.createObjectURL(file);
+            previewContainer.appendChild(fileInfo);
+            previewContainer.appendChild(img);
+            thumbnailPreview.appendChild(previewContainer);
+        });
+    }
+
+    // 삭제 체크박스 이벤트
+    const deleteThumbnailCheckbox = document.getElementById('deleteThumbnail');
+    if (deleteThumbnailCheckbox) {
+        deleteThumbnailCheckbox.addEventListener('change', function () {
+            const currentThumbnail = document.getElementById('currentThumbnail');
+            if (this.checked) {
+                // 체크하면 현재 썸네일에 반투명 효과
+                if (currentThumbnail) {
+                    currentThumbnail.classList.add('delete-pending');
+                    const overlay = document.createElement('div');
+                    overlay.id = 'deleteOverlay';
+                    overlay.className = 'delete-overlay';
+                    overlay.innerHTML = '<span class="delete-badge">삭제 예정</span>';
+                    currentThumbnail.appendChild(overlay);
+                }
+                // 파일 선택 초기화
+                if (thumbnailFileInput) thumbnailFileInput.value = '';
+            } else {
+                // 체크 해제하면 원래대로
+                if (currentThumbnail) {
+                    currentThumbnail.classList.remove('delete-pending');
+                    const overlay = document.getElementById('deleteOverlay');
+                    if (overlay) overlay.remove();
+                }
+            }
+        });
+    }
+});

@@ -362,6 +362,7 @@ public class PostController {
             @RequestParam(name = "thumbnailUrl", required = false) String thumbnailUrlParam,
             @RequestParam(required = false) Boolean deleteThumbnail,
             @RequestParam(value = "deleteImageIds", required = false) java.util.List<Long> deleteImageIds,
+            @RequestParam(value = "deleteFileUrls", required = false) java.util.List<String> deleteFileUrls,
             @RequestParam(value = "files", required = false) java.util.List<MultipartFile> files,
             @RequestParam(value = "imageFiles", required = false) java.util.List<MultipartFile> imageFiles,
             @RequestParam(value = "imageUrls", required = false) String imageUrls,
@@ -377,6 +378,23 @@ public class PostController {
         post.setContent(content);
         post.setCategory(category);
         post.setTags(tags);
+
+        // 일반 파일(files_url) 삭제 처리
+        if (deleteFileUrls != null && !deleteFileUrls.isEmpty()) {
+            String existing = post.getFilesUrl();
+            if (existing != null && !existing.isBlank()) {
+                java.util.List<String> current = new java.util.ArrayList<>(java.util.Arrays.asList(existing.split(",")));
+                java.util.Iterator<String> it = current.iterator();
+                while (it.hasNext()) {
+                    String url = it.next().trim();
+                    if (deleteFileUrls.contains(url)) {
+                        deleteAttachmentFileByUrl(url);
+                        it.remove();
+                    }
+                }
+                post.setFilesUrl(current.isEmpty() ? null : String.join(",", current));
+            }
+        }
 
         // 썸네일 삭제 체크박스가 체크된 경우
         if (Boolean.TRUE.equals(deleteThumbnail)) {
@@ -644,6 +662,23 @@ public class PostController {
             }
         } catch (Exception ex) {
             // 삭제 실패 시에도 흐름은 계속
+            ex.printStackTrace();
+        }
+    }
+
+    // 일반 파일 삭제 메서드 (URL 기반, uploads/files 하위만 허용)
+    private void deleteAttachmentFileByUrl(String existingUrl) {
+        if (existingUrl == null || existingUrl.isBlank()) return;
+        try {
+            if (existingUrl.startsWith("/uploads/files/")) {
+                String existingName = existingUrl.substring(existingUrl.lastIndexOf('/') + 1);
+                Path uploadsDir = Paths.get("uploads/files").toAbsolutePath().normalize();
+                Path existingPath = uploadsDir.resolve(existingName).normalize();
+                if (existingPath.startsWith(uploadsDir)) {
+                    Files.deleteIfExists(existingPath);
+                }
+            }
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }

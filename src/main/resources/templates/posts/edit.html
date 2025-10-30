@@ -24,11 +24,14 @@
     <main class="container" style="padding-top:28px;padding-bottom:40px">
         <div class="write-layout"
             style="display:flex;flex-direction:row;align-items:stretch;gap:0;position:relative;min-height:600px;">
-            <div class="write-form"
-                style="min-width:0;max-width:680px;flex-basis:680px;padding-right:32px;flex:1 1 0;z-index:1;background:#fff;">
-                <h1 style="margin-top:0;margin-bottom:0;color:var(--text)">글 수정</h1><br>
-                <form th:action="@{'/posts/edit/' + ${post.id}}" method="post" enctype="multipart/form-data"
-                    class="editor-form" style="display:grid;gap:14px">
+            <form th:action="@{'/posts/edit/' + ${post.id}}" method="post" enctype="multipart/form-data"
+                  class="editor-form"
+                  style="display:flex;flex-direction:row;flex:1;gap:0;position:relative;min-height:600px;">
+
+                <!-- 왼쪽: 글 작성 영역 -->
+                <div class="write-form"
+                     style="min-width:0;max-width:680px;flex-basis:680px;padding-right:32px;flex:1 1 0;z-index:1;background:#fff;">
+                    <h1 style="margin-top:0;margin-bottom:0;color:var(--text)">글 수정</h1><br>
                     <input type="hidden" id="csrfField" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     <!-- 에디터에서 비동기 업로드로 삽입된 이미지 URL 목록(콤마 구분) -->
                     <input type="hidden" id="imageUrls" name="imageUrls" value="" />
@@ -97,9 +100,10 @@
                         <a th:href="@{'/posts/' + ${post.id}}" class="btn btn-secondary">취소</a>
                         <button type="submit" class="btn btn-primary">수정 완료</button>
                     </div>
-                </form>
-            </div>
-            <aside class="editor-sidebar"
+                </div>
+
+                <!-- 오른쪽: 사이드바 -->
+                <aside class="editor-sidebar"
                 style="position:sticky;top:100px;right:0;align-self:flex-start;min-height:600px;display:flex;flex-direction:column;justify-content:flex-start;background:#fafbfc;border:1px solid #e6e8eb;border-radius:10px;padding:15px;min-width:280px;max-width:280px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-left:40px;margin-right:32px;z-index:2;">
                 <div class="editor-toolbar"
                     style="display:flex;gap:8px;flex-wrap:wrap;padding:8px;border:1px solid #e6e8eb;border-radius:6px;background:#fafbfc">
@@ -207,7 +211,31 @@
                         첨부된 파일이 없습니다.
                     </div>
                 </div>
-            </aside>
+
+                <!-- 기존 일반 파일 목록 (files_url 기반, 체크삭제) -->
+                <div class="form-group" style="margin-top:12px">
+                    <label style="font-weight:600">현재 일반 파일</label>
+                    <div th:if="${post.filesUrl != null && !#strings.isEmpty(post.filesUrl)}"
+                         style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
+                        <div th:each="fUrl : ${#strings.arraySplit(post.filesUrl, ',')}"
+                             th:with="fileName=${fUrl != null ? fUrl.substring(fUrl.lastIndexOf('/') + 1) : ''}"
+                             style="display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:8px;border:1px solid #e6e8eb;border-radius:6px;padding:8px;background:#fff">
+                            <input type="checkbox" name="deleteFileUrls" th:value="${fUrl}"
+                                   th:id="${'del-file-' + fileName}" style="margin:0" />
+                            <label th:for="${'del-file-' + fileName}"
+                                   th:text="${fileName}"
+                                   th:title="${fUrl}"
+                                   style="margin:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;direction:rtl;unicode-bidi:plaintext;"></label>
+                            <a th:href="${fUrl}" target="_blank" style="font-size:12px;text-decoration:none;color:var(--accent)">보기</a>
+                        </div>
+                        <small style="color:var(--muted)">체크한 일반 파일은 저장 시 삭제됩니다.</small>
+                    </div>
+                    <div th:if="${post.filesUrl == null || #strings.isEmpty(post.filesUrl)}" style="color:var(--muted);font-size:13px;margin-top:6px">
+                        등록된 일반 파일이 없습니다.
+                    </div>
+                </div>
+                </aside>
+            </form>
     </main>
     <div th:replace="~{fragments/footer :: footer}"></div>
     <script defer th:src="@{/js/posts/edit.js}"></script>

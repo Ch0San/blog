@@ -66,33 +66,33 @@
                 게시글 내용이 여기에 표시됩니다.
             </div>
 
-            <!-- 첨부파일 다운로드 섹션 -->
-            <div class="attachments-section" th:if="${attachments != null and attachments.size() > 0}"
-                style="margin-top:30px;padding:20px;background:#f8f9fa;border-radius:8px;border:1px solid #e9ecef">
+            <!-- 첨부파일 다운로드 섹션 (files_url 기반) -->
+            <div class="attachments-section"
+                 th:if="${post.filesUrl != null and !#strings.isEmpty(post.filesUrl)}"
+                 style="margin-top:30px;padding:20px;background:#f8f9fa;border-radius:8px;border:1px solid #e9ecef">
                 <h4 style="margin:0 0 16px 0;color:var(--text);font-size:16px;font-weight:600">
-                    📎 첨부파일 (<span th:text="${attachments.size()}">0</span>개)
+                    📎 첨부파일
                 </h4>
                 <div class="attachment-list" style="display:flex;flex-direction:column;gap:10px">
-                    <div class="attachment-item" th:each="image, iterStat : ${attachments}"
-                        th:with="filename=${image.imageUrl != null ? (image.imageUrl.contains('/') ? image.imageUrl.substring(image.imageUrl.lastIndexOf('/') + 1) : image.imageUrl) : 'file'},
-                              ext=${filename.contains('.') ? filename.substring(filename.lastIndexOf('.') + 1).toLowerCase() : ''},
-                              displayName=${image.caption != null and !#strings.isEmpty(image.caption) ? image.caption : filename}"
-                        style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:white;border-radius:6px;border:1px solid #dee2e6">
+                    <div class="attachment-item"
+                         th:each="fUrl : ${#strings.arraySplit(post.filesUrl, ',')}"
+                         th:with="filename=${fUrl != null ? fUrl.substring(fUrl.lastIndexOf('/') + 1) : 'file'},
+                                  ext=${filename.contains('.') ? filename.substring(filename.lastIndexOf('.') + 1).toLowerCase() : ''}"
+                         style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:white;border-radius:6px;border:1px solid #dee2e6">
                         <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
                             <span style="font-size:20px"
-                                th:text="${ext == 'zip' or ext == 'rar' or ext == '7z' ? '📦' : (ext == 'pdf' ? '📄' : (ext == 'doc' or ext == 'docx' ? '📝' : (ext == 'xls' or ext == 'xlsx' ? '📊' : '📎')))}">�</span>
+                                  th:text="${ext == 'zip' or ext == 'rar' or ext == '7z' ? '📦' : (ext == 'pdf' ? '📄' : (ext == 'doc' or ext == 'docx' ? '📝' : (ext == 'xls' or ext == 'xlsx' ? '📊' : '📎')))}">📎</span>
                             <div style="flex:1;min-width:0">
                                 <div style="font-weight:500;color:var(--text);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
-                                    th:text="${displayName}">
-                                    파일명
-                                </div>
+                                     th:text="${filename}">파일명</div>
                                 <div style="font-size:12px;color:var(--muted);margin-top:2px">
-                                    <span th:text="${ext.toUpperCase()}">확장자</span>
+                                    <span th:text="${ext != null ? ext.toUpperCase() : ''}">EXT</span>
                                 </div>
                             </div>
                         </div>
-                        <a th:href="@{/posts/download(filename=${filename})}" class="btn btn-primary"
-                            style="padding:8px 16px;font-size:13px;white-space:nowrap;text-decoration:none" download>
+                        <a th:href="@{/posts/file/download(filename=${filename})}"
+                           class="btn btn-primary"
+                           style="padding:8px 16px;font-size:13px;white-space:nowrap;text-decoration:none" download>
                             💾 다운로드
                         </a>
                     </div>

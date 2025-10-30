@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>스토리 수정</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <!-- CSRF for AJAX -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+</head>
+
+<body>
+    <!-- 공통 헤더 import -->
+    <div th:replace="~{fragments/header :: header('stories')}"></div>
+
+
+    <main class="container" style="padding-top:28px;padding-bottom:40px">
+        <form th:action="@{'/stories/edit/' + ${story.id}}" method="post" enctype="multipart/form-data" style="width:100%">
+            <div class="write-layout"
+                style="display:flex;flex-direction:row;align-items:stretch;gap:0;position:relative;min-height:600px;">
+                <div class="write-form"
+                    style="min-width:0;max-width:680px;flex-basis:680px;padding-right:32px;flex:1 1 0;z-index:1;background:#fff;">
+                    <h1 style="margin-top:0;margin-bottom:0;color:var(--text)">스토리 수정</h1><br>
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="text" id="title" name="title" th:value="${story.title}" placeholder="제목을 입력하세요"
+                        required style="padding:12px 14px;border:1px solid #dcdde1;border-radius:6px;font-size:16px;width:100%;display:block;margin-bottom:10px">
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <input type="text" id="author" name="author" th:value="${story.author}" placeholder="작성자"
+                            required style="flex:1;padding:10px 12px;border:1px solid #dcdde1;border-radius:6px">
+                        <select id="category" name="category"
+                            style="padding:10px 12px;border:1px solid #dcdde1;border-radius:6px">
+                            <option value="" th:selected="${story.category == null || story.category == ''}">카테고리
+                            </option>
+                            <option value="여행" th:selected="${story.category == '여행'}">여행</option>
+                            <option value="맛집" th:selected="${story.category == '맛집'}">맛집</option>
+                            <option value="기술" th:selected="${story.category == '기술'}">기술</option>
+                            <option value="브이로그" th:selected="${story.category == '브이로그'}">브이로그</option>
+                        </select>
+                        <input type="text" id="tags" name="tags" th:value="${story.tags}" placeholder="태그(,로 구분)"
+                            style="flex:1;padding:10px 12px;border:1px solid #dcdde1;border-radius:6px">
+                    </div><br>
+                    <div class="form-group">
+                        <label for="description">내용</label>
+                        <textarea id="description" name="description" th:text="${story.description}"
+                            placeholder="스토리에 대한 간단한 설명을 입력하세요" rows="4"
+                            style="width:100%;padding:12px 14px;border:1px solid #dcdde1;border-radius:6px;font-size:14px;resize:vertical;font-family:'Noto Sans KR',sans-serif"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <a th:href="@{'/stories/' + ${story.id}}" class="btn btn-secondary">취소</a>
+                        <button type="submit" class="btn btn-primary">수정 완료</button>
+                    </div>
+                </div>
+                <aside class="editor-sidebar"
+                    style="position:sticky;top:100px;right:0;align-self:flex-start;min-height:600px;display:flex;flex-direction:column;justify-content:flex-start;background:#fafbfc;border:1px solid #e6e8eb;border-radius:10px;padding:15px;min-width:280px;max-width:280px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-left:40px;margin-right:32px;z-index:2;">
+                    <div class="form-group" style="margin-bottom:24px">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                            <label for="thumbnailFile" style="font-weight:600;margin-bottom:0;">썸네일 이미지 변경<br>
+                                (선택사항)</label>
+                            <label class="thumbnail-delete-label"
+                                style="font-size:13px;color:#666;display:flex;align-items:center;gap:2px;margin-bottom:0;white-space:nowrap;">
+                                <input type="checkbox" id="deleteThumbnail" name="deleteThumbnail" value="true"
+                                    style="margin-right:2px;transform:scale(0.9)"><span style="display:inline;">🗑️
+                                    삭제</span>
+                            </label>
+                        </div>
+                        <input type="file" id="thumbnailFile" name="thumbnailFile" accept="image/*"
+                            style="margin:10px 0 4px 0;">
+                        <small style="color:var(--muted);display:block;margin-top:4px">새 썸네일을 선택하지 않으면 기존 썸네일이 유지됩니다. 썸네일이
+                            없으면 동영상 첫 화면이 표시됩니다.</small>
+                        <div id="thumbnailPreview" class="thumbnail-preview-container">
+                            <div th:if="${story.thumbnailUrl != null && !#strings.isEmpty(story.thumbnailUrl)}"
+                                id="currentThumbnail" class="current-thumbnail">
+                                <span class="thumbnail-preview-label">현재 썸네일:</span>
+                                <img th:src="${story.thumbnailUrl}" class="thumbnail-preview-image" alt="현재 썸네일">
+                            </div>
+                            <div th:if="${story.thumbnailUrl == null || #strings.isEmpty(story.thumbnailUrl)}"
+                                class="no-thumbnail-message">
+                                📷 현재 등록된 썸네일이 없습니다.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0">
+                        <label for="videoFile" style="font-weight:600">동영상 변경<br> (100MB 이하, 선택사항)</label>
+                        <input type="file" id="videoFile" name="videoFile" accept="video/*"
+                            style="padding:10px;border:1px solid #dcdde1;border-radius:6px">
+                        <small style="color:var(--muted);display:block;margin-top:4px">지원 형식: MP4, WebM, AVI 등 (최대 100MB) -
+                            새 동영상을 선택하지 않으면 기존 동영상이 유지됩니다.</small>
+                        <div id="videoPreview" style="margin-top:10px"></div>
+                    </div>
+                </aside>
+            </div>
+        </form>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script defer th:src="@{/js/stories/edit.js}"></script>
+</body>
+
+</html>

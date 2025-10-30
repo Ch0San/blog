@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>글쓰기</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <!-- CSRF for AJAX -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <!-- Kakao Maps SDK 동적 주입(쿼리스트링 보장) -->
+    <meta name="kakao-js-key" th:content="${kakaoJsKey}">
+</head>
+
+<body>
+    <!-- 공통 헤더 import -->
+    <div th:replace="~{fragments/header :: header('posts')}"></div>
+
+    <main class="container" style="padding-top:28px;padding-bottom:40px">
+        <div class="write-layout"
+            style="display:flex;flex-direction:row;align-items:stretch;gap:0;position:relative;min-height:600px;">
+            <div class="write-form"
+                style="min-width:0;max-width:680px;flex-basis:680px;padding-right:32px;flex:1 1 0;z-index:1;background:#fff;">
+                <h1 style="margin-top:0;margin-bottom:0;color:var(--text)">글쓰기</h1><br>
+                <form th:action="@{/posts/write}" method="post" enctype="multipart/form-data" class="editor-form"
+                    style="display:grid;gap:14px">
+                    <input type="hidden" id="csrfField" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" id="imageUrls" name="imageUrls" value="" />
+                    <input type="hidden" id="thumbnailUrl" name="thumbnailUrl" value="" />
+                    <input type="text" id="title" name="title" placeholder="제목을 입력하세요" required
+                        style="padding:12px 14px;border:1px solid #dcdde1;border-radius:6px;font-size:16px;width:100%;display:block">
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <input type="text" id="author" name="author" placeholder="작성자" required
+                            style="flex:1;padding:10px 12px;border:1px solid #dcdde1;border-radius:6px">
+                        <select id="category" name="category"
+                            style="padding:10px 12px;border:1px solid #dcdde1;border-radius:6px">
+                            <option value="">카테고리</option>
+                            <option value="일상">일상</option>
+                            <option value="기술">기술</option>
+                            <option value="여행">여행</option>
+                            <option value="맛집">맛집</option>
+                            <option value="취미">취미</option>
+                        </select>
+                        <input type="text" id="tags" name="tags" placeholder="태그(,로 구분)"
+                            style="flex:1;padding:10px 12px;border:1px solid #dcdde1;border-radius:6px">
+                    </div>
+
+                    <div class="editor-body">
+                        <textarea id="content" name="content" placeholder="내용을 입력하세요" required
+                            style="display:none"></textarea>
+                        <div id="livePreview" contenteditable="true" class="editing"></div>
+                    </div>
+                    <input type="file" id="inlineImageUpload" accept="image/*" multiple style="display:none" />
+                    <div id="mapModalBackdrop" class="map-modal-backdrop"></div>
+                    <div id="mapModal" class="map-modal" role="dialog" aria-modal="true"
+                        aria-labelledby="mapModalTitle">
+                        <header>
+                            <strong id="mapModalTitle">지도에서 위치 선택</strong>
+                            <button type="button" id="mapModalClose" class="btn btn-secondary"
+                                style="padding:6px 10px">닫기</button>
+                        </header>
+                        <div class="body">
+                            <div class="search">
+                                <input type="text" id="mapSearchInput"
+                                    placeholder="장소명/주소를 입력 후 검색하거나, 지도에서 직접 선택하세요" />
+                                <button type="button" id="mapSearchBtn" class="btn btn-secondary">검색</button>
+                            </div>
+                            <div id="kmap-picker"></div>
+                            <div id="mapPickedInfo" class="muted">선택된 위치가 없습니다.</div>
+                        </div>
+                        <footer>
+                            <button type="button" id="mapInsertBtn" class="btn btn-primary" disabled>본문에 삽입</button>
+                        </footer>
+                    </div>
+                    <div class="form-actions">
+                        <a href="/posts" class="btn btn-secondary">취소</a>
+                        <button type="submit" class="btn btn-primary">등록</button>
+                    </div>
+                </form>
+            </div>
+            <aside class="editor-sidebar"
+                style="position:sticky;top:100px;right:0;align-self:flex-start;min-height:600px;display:flex;flex-direction:column;justify-content:flex-start;background:#fafbfc;border:1px solid #e6e8eb;border-radius:10px;padding:15px;min-width:280px;max-width:280px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-left:40px;margin-right:32px;z-index:2;">
+                <div class="editor-toolbar"
+                    style="display:flex;gap:8px;flex-wrap:wrap;padding:8px;border:1px solid #e6e8eb;border-radius:6px;background:#fafbfc">
+                    <select id="tb-fontFamily" class="editor-select"
+                        style="padding:2px 4px;border:1px solid #dcdde1;border-radius:4px;background:#fff;font-size:11px;min-width:56px">
+                        <option value="">글꼴</option>
+                        <option value="'Noto Sans KR', sans-serif">Noto Sans KR</option>
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="'Times New Roman', serif">Times New Roman</option>
+                        <option value="'Courier New', monospace">Courier New</option>
+                        <option value="Georgia, serif">Georgia</option>
+                        <option value="'Malgun Gothic', sans-serif">맑은 고딕</option>
+                    </select>
+                    <select id="tb-fontSize" class="editor-select"
+                        style="padding:2px 4px;border:1px solid #dcdde1;border-radius:4px;background:#fff;font-size:11px;width:48px;min-width:48px">
+                        <option value="">크기</option>
+                        <option value="12px">12px</option>
+                        <option value="14px">14px</option>
+                        <option value="16px">16px</option>
+                        <option value="18px">18px</option>
+                        <option value="20px">20px</option>
+                        <option value="24px">24px</option>
+                        <option value="28px">28px</option>
+                        <option value="32px">32px</option>
+                    </select>
+                    <button type="button" class="btn editor-btn" id="tb-bold" title="볼드"
+                        style="min-width:22px;padding:2px 4px;font-size:11px">B</button>
+                    <button type="button" class="btn editor-btn" id="tb-italic" title="이탤릭"
+                        style="min-width:22px;padding:2px 4px;font-size:11px">I</button>
+                    <button type="button" class="btn editor-btn" id="tb-underline" title="밑줄"
+                        style="min-width:22px;padding:2px 4px;font-size:11px">U</button>
+                    <label for="tb-color" style="display:flex;align-items:center;gap:2px;font-size:11px;color:#666">
+                        색상
+                        <input type="color" id="tb-color" title="글자 색상"
+                            style="width:32px;height:28px;padding:0;border:1px solid #dcdde1;border-radius:4px;background:#fff;cursor:pointer">
+                    </label>
+                    <div class="align-group" style="display:flex;gap:1px;align-items:center">
+                        <button type="button" class="btn editor-btn" id="tb-align-left" title="왼쪽 정렬"
+                            style="min-width:22px;padding:2px 4px;font-size:11px">좌</button>
+                        <button type="button" class="btn editor-btn" id="tb-align-center" title="가운데 정렬"
+                            style="min-width:22px;padding:2px 4px;font-size:11px">중</button>
+                        <button type="button" class="btn editor-btn" id="tb-align-right" title="오른쪽 정렬"
+                            style="min-width:22px;padding:2px 4px;font-size:11px">우</button>
+                    </div>
+                    <span style="flex:1"></span>
+                    <div style="width:100%;display:flex;gap:4px;align-items:center">
+                        <button type="button" class="btn editor-btn" id="tb-image"
+                            style="min-width:24px;padding:2px 6px;font-size:11px">🖼 이미지</button>
+                        <button type="button" class="btn editor-btn" id="tb-video"
+                            style="min-width:24px;padding:2px 6px;font-size:11px">🎬 동영상</button>
+                        <button type="button" class="btn editor-btn" id="tb-map"
+                            style="min-width:24px;padding:2px 6px;font-size:11px">🗺 지도</button>
+                    </div>
+                </div><br>
+                <div class="form-group" style="margin-bottom:24px">
+                    <label style="font-weight:600">썸네일 미리보기</label>
+                    <small style="color:var(--muted);display:block;margin-top:4px">본문 이미지에 마우스를 올리고 좌측 상단의 ‘썸네일’ 버튼을 눌러
+                        썸네일을 지정하세요.</small>
+                    <div id="thumbnailPreview" class="thumbnail-preview-container">
+                        <div class="no-thumbnail-message">
+                            📷 현재 등록된 썸네일이 없습니다.
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label for="imageFiles" style="font-weight:600">파일 업로드<br>(여러 개, 각 10MB 이하)</label>
+                    <input type="file" id="imageFiles" name="imageFiles" multiple style="margin-bottom:8px">
+                    <small style="color:var(--muted)">모든 형식의 파일을 첨부할 수 있습니다.</small>
+                    <div id="imagePreviewList"
+                        style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px">
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script defer th:src="@{/js/posts/write.js}"></script>
+</body>
+
+</html>

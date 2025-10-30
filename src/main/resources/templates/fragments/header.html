@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <!-- 공통 헤더 프래그먼트 -->
+    <header th:fragment="header(currentPage)">
+        <div class="container topbar">
+            <a href="/" class="logo">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="24" height="24" rx="6" fill="var(--accent)" />
+                    <path d="M7 12h10" stroke="#fff" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+                내 이야기
+            </a>
+            <nav>
+                <div class="dropdown">
+                    <a href="/posts" th:classappend="${currentPage == 'posts'} ? 'active' : ''" class="dropdown-toggle">
+                        포스트
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            class="dropdown-arrow">
+                            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="/posts" class="dropdown-item">전체</a>
+                        <a href="/posts?category=여행" class="dropdown-item">여행</a>
+                        <a href="/posts?category=맛집" class="dropdown-item">맛집</a>
+                        <a href="/posts?category=기술" class="dropdown-item">기술</a>
+                        <a href="/posts?category=일상" class="dropdown-item">일상</a>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <a href="/stories" th:classappend="${currentPage == 'stories'} ? 'active' : ''"
+                        class="dropdown-toggle">
+                        스토리
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            class="dropdown-arrow">
+                            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="/stories" class="dropdown-item">전체</a>
+                        <a href="/stories?category=여행" class="dropdown-item">여행</a>
+                        <a href="/stories?category=맛집" class="dropdown-item">맛집</a>
+                        <a href="/stories?category=기술" class="dropdown-item">기술</a>
+                        <a href="/stories?category=브이로그" class="dropdown-item">브이로그</a>
+                    </div>
+                </div>
+            </nav>
+            <div class="search">
+                <form id="globalSearchForm" method="get" th:action="@{/posts/search}">
+                    <select id="boardSelect">
+                        <option value="posts" th:selected="${currentPage == 'posts'}">포스트</option>
+                        <option value="stories" th:selected="${currentPage == 'stories'}">스토리</option>
+                    </select>
+                    <select name="field" id="globalField">
+                        <option value="title">제목</option>
+                        <option value="content">내용</option>
+                        <option value="tags">태그</option>
+                    </select>
+                    <input type="text" name="q" id="globalQ" placeholder="검색어">
+                    <button type="submit">검색</button>
+                </form>
+            </div>
+            <div class="auth-area">
+                <!-- 비로그인: 회원가입/로그인 버튼 -->
+                <div class="auth-buttons" sec:authorize="!isAuthenticated()">
+                    <a href="/member/signup" class="auth-btn signup-btn">회원가입</a>
+                    <a href="/member/signin" class="auth-btn signin-btn">로그인</a>
+                </div>
+                <!-- 로그인: 닉네임/로그아웃 버튼 -->
+                <div class="user-area" sec:authorize="isAuthenticated()">
+                    <span class="user-chip" title="로그인 계정" sec:authentication="name">사용자</span>
+                    <form th:action="@{/member/signout}" method="post" class="signout-form">
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}" />
+                        <button type="submit" class="auth-btn signin-btn">로그아웃</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+    <script>
+        (function () {
+            var form = document.getElementById('globalSearchForm');
+            var board = document.getElementById('boardSelect');
+            var field = document.getElementById('globalField');
+            var q = document.getElementById('globalQ');
+
+            function updateAction() {
+                if (board.value === 'stories') {
+                    form.action = '/stories/search';
+                } else {
+                    form.action = '/posts/search';
+                }
+            }
+
+            board.addEventListener('change', updateAction);
+            // 초기 상태 설정
+            updateAction();
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>회원가입</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+
+<body>
+    <!-- 공통 헤더 import -->
+    <div th:replace="~{fragments/header :: header('home')}"></div>
+
+    <main class="container" style="padding-top:28px;padding-bottom:40px">
+        <div class="write-form">
+            <h1 style="margin-top:0;margin-bottom:10px;color:var(--text)">회원가입</h1>
+            <p style="margin-bottom:30px;color:var(--muted);font-size:14px">블로그 서비스에 오신 것을 환영합니다!</p>
+
+            <form th:action="@{/member/signup}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <div class="form-group">
+                    <label for="nickname">닉네임 <span style="color:#ff4444">*</span></label>
+                    <input type="text" id="nickname" name="nickname" placeholder="표시할 닉네임을 입력하세요" maxlength="50"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="username">아이디 <span style="color:#ff4444">*</span></label>
+                    <input type="text" id="username" name="username" placeholder="아이디를 입력하세요 (4-20자)"
+                        pattern="[a-zA-Z0-9_]{4,20}" required>
+                    <small style="color:var(--muted);font-size:12px">영문, 숫자, 언더스코어(_)만 사용 가능합니다.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">비밀번호 <span style="color:#ff4444">*</span></label>
+                    <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요 (8자 이상)" minlength="8"
+                        required>
+                    <small style="color:var(--muted);font-size:12px">8자 이상 입력해주세요.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="passwordConfirm">비밀번호 확인 <span style="color:#ff4444">*</span></label>
+                    <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="비밀번호를 다시 입력하세요"
+                        minlength="8" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">이메일 <span style="color:#ff4444">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="example@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">전화번호</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="010-1234-5678"
+                        pattern="[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}">
+                    <small style="color:var(--muted);font-size:12px">형식: 010-1234-5678</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">주소</label>
+                    <input type="text" id="address" name="address" placeholder="주소를 입력하세요">
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                    <label for="agreeTerms" style="margin:0;font-weight:400">
+                        <span style="color:#ff4444">*</span> 이용약관 및 개인정보처리방침에 동의합니다
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/" class="btn btn-secondary">취소</a>
+                    <button type="submit" class="btn btn-primary">가입하기</button>
+                </div>
+            </form>
+
+            <div style="margin-top:24px;text-align:center;padding-top:24px;border-top:1px solid #e6e9ee">
+                <p style="color:var(--muted);font-size:14px">
+                    이미 계정이 있으신가요?
+                    <a href="/member/signin" style="color:var(--accent);font-weight:600;text-decoration:none">로그인</a>
+                </p>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+        // 비밀번호 확인 검증
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('passwordConfirm').value;
+
+            if (password !== passwordConfirm) {
+                e.preventDefault();
+                alert('비밀번호가 일치하지 않습니다.');
+                document.getElementById('passwordConfirm').focus();
+                return false;
+            }
+        });
+    </script>
+</body>
+
+</html>

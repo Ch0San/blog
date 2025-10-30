@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title th:text="${notice != null ? notice.title : '공지사항'}">공지사항</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+		rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header('home')}"></div>
+
+	<main class="container" style="padding-top:28px">
+		<article class="post-detail">
+			<header class="post-header">
+				<span class="post-category">공지</span>
+				<h1 class="post-title" th:text="${notice.title}">공지 제목</h1>
+				<div class="post-meta-info">
+					<span th:text="${notice.author}">관리자</span>
+					<span class="separator">|</span>
+					<span th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd HH:mm')}">2025-10-29</span>
+					<span class="separator">|</span>
+					<span>조회 <strong th:text="${notice.viewCount}">0</strong></span>
+				</div>
+			</header>
+
+			<div class="post-content" th:utext="${#strings.replace(notice.content, '\n', '<br/>')}">내용</div>
+
+			<div class="post-actions">
+				<div class="action-buttons">
+					<a href="/notice" class="btn btn-secondary">목록</a>
+				</div>
+				<div class="action-buttons" sec:authorize="hasRole('ADMIN')">
+					<a th:href="@{'/notice/edit/' + ${notice.id}}" class="btn btn-secondary">수정</a>
+					<form th:action="@{'/notice/delete/' + ${notice.id}}" method="post" style="display:inline">
+						<input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+							th:value="${_csrf.token}" />
+						<button type="submit" class="btn btn-danger" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+					</form>
+				</div>
+			</div>
+		</article>
+	</main>
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

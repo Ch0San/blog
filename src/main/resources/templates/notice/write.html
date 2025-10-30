@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>공지 등록</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+		rel="stylesheet">
+	<link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header('home')}"></div>
+
+	<main class="container" style="padding-top:28px;padding-bottom:40px">
+		<div class="write-form">
+			<h1 style="margin:0 0 12px;color:var(--text)">공지 등록</h1>
+			<form th:action="@{/notice/write}" method="post" style="display:grid;gap:14px">
+				<input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}"
+					th:value="${_csrf.token}" />
+				<div class="form-group">
+					<label for="title">제목</label>
+					<input id="title" name="title" type="text" required />
+				</div>
+				<div class="form-group">
+					<label for="author">작성자</label>
+					<input id="author" name="author" type="text" required />
+				</div>
+				<div class="form-group">
+					<label for="content">내용</label>
+					<textarea id="content" name="content" required class="notice-content"
+						placeholder="공지 내용을 입력하세요"></textarea>
+				</div>
+				<div class="form-actions">
+					<a href="/notice" class="btn btn-secondary">취소</a>
+					<button type="submit" class="btn btn-primary">등록</button>
+				</div>
+			</form>
+		</div>
+		<p class="muted" style="color:var(--muted);margin-top:8px;font-size:12px">※ 공지사항은 관리자만 작성/수정할 수 있으며, 누구나 열람할 수
+			있습니다.</p>
+	</main>
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

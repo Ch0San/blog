@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>스토리</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+
+<body>
+    <!-- 공통 헤더 import -->
+    <div th:replace="~{fragments/header :: header('stories')}"></div>
+
+    <main class="container" style="padding-top:28px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+            <div style="display:flex;align-items:center;gap:20px">
+                <h1 style="margin:0;color:var(--text)">스토리</h1>
+                <!-- 카테고리 탭 -->
+                <div class="category-tabs">
+                    <a th:href="@{/stories}" th:classappend="${currentCategory == null ? 'active' : ''}"
+                        class="category-tab">
+                        전체
+                    </a>
+                    <a th:href="@{/stories(category='여행')}" th:classappend="${currentCategory == '여행' ? 'active' : ''}"
+                        class="category-tab">
+                        여행
+                    </a>
+                    <a th:href="@{/stories(category='맛집')}" th:classappend="${currentCategory == '맛집' ? 'active' : ''}"
+                        class="category-tab">
+                        맛집
+                    </a>
+                    <a th:href="@{/stories(category='기술')}" th:classappend="${currentCategory == '기술' ? 'active' : ''}"
+                        class="category-tab">
+                        기술
+                    </a>
+                    <a th:href="@{/stories(category='브이로그')}"
+                        th:classappend="${currentCategory == '브이로그' ? 'active' : ''}" class="category-tab">
+                        브이로그
+                    </a>
+                </div>
+            </div>
+            <a sec:authorize="hasRole('ADMIN')" href="/stories/write"
+                style="background:var(--accent);color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:500;transition:opacity 0.2s"
+                onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">글쓰기</a>
+        </div>
+
+        <div th:if="${stories.size()} == 0" class="empty-state">
+            <p style="font-size:1.1em">스토리가 없습니다.</p>
+        </div>
+
+        <!-- 스토리 그리드 -->
+        <div class="stories-grid">
+            <article class="stories-card" th:each="story : ${stories}">
+                <a th:href="@{'/stories/' + ${story.id}}" class="stories-link">
+                    <!-- 썸네일 또는 동영상 첫 화면 -->
+                    <div class="stories-thumbnail" style="position:relative;">
+                        <!-- 썸네일 이미지가 있는 경우 -->
+
+
+                        <!-- 썸네일이 있을 때: 썸네일과 미리보기용 비디오 모두 렌더링, JS로 제어 -->
+                        <img th:if="${story.thumbnailUrl != null and !story.thumbnailUrl.isEmpty()}"
+                            th:src="${story.thumbnailUrl}" th:alt="${story.title}"
+                            class="thumbnail-img preview-thumbnail"
+                            th:data-video-url="${story.videoUrl}"
+                            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;transition:opacity 0.2s;z-index:2">
+                        <video th:if="${story.thumbnailUrl != null and !story.thumbnailUrl.isEmpty()} and ${story.videoUrl != null and !story.videoUrl.isEmpty()}"
+                            class="video-preview-on-hover" preload="metadata" muted playsinline
+                            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:3;display:none;">
+                            <source th:src="${story.videoUrl}" type="video/mp4">
+                        </video>
+
+                        <!-- 썸네일 없고 동영상만 있을 때 기존과 동일 -->
+                        <video
+                            th:if="${story.thumbnailUrl == null or story.thumbnailUrl.isEmpty()} and ${story.videoUrl != null and !story.videoUrl.isEmpty()}"
+                            th:data-video-url="${story.videoUrl}" class="video-thumbnail" preload="metadata" muted
+                            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:1;">
+                            <source th:src="${story.videoUrl + '#t=0.1'}" type="video/mp4">
+                        </video>
+
+                        <!-- 썸네일도 동영상도 없는 경우 -->
+                        <div th:if="${(story.thumbnailUrl == null or story.thumbnailUrl.isEmpty()) and (story.videoUrl == null or story.videoUrl.isEmpty())}"
+                            style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+                        </div>
+
+                        <!-- 카테고리 배지 -->
+                        <span class="stories-badge"
+                            th:text="${story.category != null ? story.category : '일반'}">카테고리</span>
+                    </div>
+
+                    <!-- 콘텐츠 영역 -->
+                    <div class="stories-content">
+                        <h3 class="stories-title" th:text="${story.title}">제목</h3>
+                        <p class="stories-excerpt"
+                            th:text="${story.description != null && #strings.length(story.description) > 60 ? #strings.substring(story.description, 0, 60) + '...' : story.description}">
+                            내용 미리보기
+                        </p>
+
+                        <!-- 메타 정보 -->
+                        <div class="stories-meta">
+                            <span th:text="${#temporals.format(story.createdAt, 'yyyy. MM. dd')}">날짜</span>
+                            <span class="stories-dot"></span>
+                            <span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:2px">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span th:text="${story.viewCount}">0</span>
+                            </span>
+                            <span class="stories-dot"></span>
+                            <span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:2px">
+                                    <path
+                                        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                                <span th:text="${story.likeCount}">0</span>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </article>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination" th:if="${page.totalPages} > 1" style="margin-top:40px">
+            <a th:if="${!page.first}"
+                th:href="${searchField} != null ? @{/stories/search(page=${page.number - 1}, field=${searchField}, q=${searchQuery})} : @{/stories(page=${page.number - 1}, category=${currentCategory})}">&laquo;
+                이전</a>
+            <span th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}">
+                <a th:if="${i != page.number}"
+                    th:href="${searchField} != null ? @{/stories/search(page=${i}, field=${searchField}, q=${searchQuery})} : @{/stories(page=${i}, category=${currentCategory})}"
+                    th:text="${i + 1}">1</a>
+                <span th:if="${i == page.number}" class="current" th:text="${i + 1}">1</span>
+            </span>
+            <a th:if="${!page.last}"
+                th:href="${searchField} != null ? @{/stories/search(page=${page.number + 1}, field=${searchField}, q=${searchQuery})} : @{/stories(page=${page.number + 1}, category=${currentCategory})}">다음
+                &raquo;</a>
+        </div>
+
+    </main>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script defer th:src="@{/js/stories/list.js}"></script>
+    <script>
+    // 썸네일에 마우스 오버 1초 유지 시 동영상 미리보기 (최대 5초)
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.stories-card');
+        cards.forEach(card => {
+            const thumbnail = card.querySelector('.preview-thumbnail');
+            const video = card.querySelector('.video-preview-on-hover');
+            if (!thumbnail || !video) return;
+            let hoverTimer = null;
+            let playing = false;
+            let resetTimeout = null;
+
+            thumbnail.addEventListener('mouseenter', () => {
+                hoverTimer = setTimeout(() => {
+                    // 썸네일 숨기고 비디오 보이기
+                    thumbnail.style.opacity = '0';
+                    video.style.display = 'block';
+                    video.currentTime = 0;
+                    video.play();
+                    playing = true;
+                    // 5초 후 자동 정지 및 썸네일 복원
+                    resetTimeout = setTimeout(() => {
+                        video.pause();
+                        video.currentTime = 0;
+                        video.style.display = 'none';
+                        thumbnail.style.opacity = '1';
+                        playing = false;
+                    }, 5000);
+                }, 1000); // 1초 유지 시
+            });
+            thumbnail.addEventListener('mouseleave', () => {
+                clearTimeout(hoverTimer);
+                if (playing) {
+                    video.pause();
+                    video.currentTime = 0;
+                    video.style.display = 'none';
+                    thumbnail.style.opacity = '1';
+                    playing = false;
+                }
+                if (resetTimeout) clearTimeout(resetTimeout);
+            });
+            // 모바일 터치 대응(탭 시 미리보기)
+            thumbnail.addEventListener('touchstart', (e) => {
+                hoverTimer = setTimeout(() => {
+                    thumbnail.style.opacity = '0';
+                    video.style.display = 'block';
+                    video.currentTime = 0;
+                    video.play();
+                    playing = true;
+                    resetTimeout = setTimeout(() => {
+                        video.pause();
+                        video.currentTime = 0;
+                        video.style.display = 'none';
+                        thumbnail.style.opacity = '1';
+                        playing = false;
+                    }, 5000);
+                }, 1000);
+            });
+            thumbnail.addEventListener('touchend', () => {
+                clearTimeout(hoverTimer);
+                if (playing) {
+                    video.pause();
+                    video.currentTime = 0;
+                    video.style.display = 'none';
+                    thumbnail.style.opacity = '1';
+                    playing = false;
+                }
+                if (resetTimeout) clearTimeout(resetTimeout);
+            });
+        });
+    });
+    </script>
+</body>
+
+</html>

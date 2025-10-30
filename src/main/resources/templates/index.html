@@ -1,0 +1,229 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>블로그 메인</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+  <!-- 공통 헤더 import -->
+  <div th:replace="~{fragments/header :: header('home')}"></div>
+
+  <!-- 헤더 바로 아래 히어로 이미지 -->
+  <section class="index_image container">
+    <div style="position:relative">
+      <img th:src="@{${heroImageUrl}}" alt="블로그 메인 이미지" style="width:100%;height:auto" />
+      <!-- 관리자만: 히어로 이미지 수정 페이지로 이동 버튼 (좌측 상단) -->
+      <div sec:authorize="hasRole('ADMIN')" class="hero-image-action">
+        <a th:href="@{/admin/site/hero-image}">이미지 수정</a>
+      </div>
+      <div class="visitor-counter">
+        <span>Today: <strong th:text="${todayVisitors}">0</strong></span>
+        <span class="separator">|</span>
+        <span>Total: <strong th:text="${totalVisitors}">0</strong></span>
+      </div>
+    </div>
+  </section>
+  <main class="container">
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="profile card">
+          <p>개발자 여행 일상 공유</p>
+          <h3 sec:authorize="isAuthenticated()">
+            <span th:text="${currentMember != null ? currentMember.nickname : ''}">사용자</span>님 반갑습니다 :D
+          </h3>
+          <h3 sec:authorize="!isAuthenticated()">반갑습니다 :D</h3>
+
+          <div sec:authorize="!isAuthenticated()" style="margin-top:16px;display:flex;gap:8px">
+            <a href="/member/signup" class="btn btn-primary"
+              style="flex:1;text-align:center;padding:8px 16px;font-size:13px">회원가입</a>
+            <a href="/member/signin" class="btn btn-secondary"
+              style="flex:1;text-align:center;padding:8px 16px;font-size:13px">로그인</a>
+          </div>
+          <div sec:authorize="isAuthenticated()" style="margin-top:16px;display:flex;gap:8px">
+            <a href="/member/update" class="btn btn-primary"
+              style="flex:1;text-align:center;padding:10px 16px;font-size:14px;display:block">정보수정</a>
+            <a sec:authorize="hasRole('ADMIN')" href="/member/list" class="btn btn-secondary"
+              style="flex:1;text-align:center;padding:10px 16px;font-size:14px;display:block">회원목록</a>
+          </div>
+        </div>
+
+        <div class="widgets" style="margin-top:12px">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <strong style="color:var(--text)">소개</strong>
+              <a sec:authorize="hasRole('ADMIN')" href="/member/introduction-update"
+                style="background:var(--accent);color:#fff;padding:4px 12px;border-radius:4px;text-decoration:none;font-size:12px;font-weight:500">
+                수정
+              </a>
+            </div>
+            <p style="margin:12px 0 0;color:var(--muted);font-size:14px;line-height:1.6;white-space:pre-line"
+              th:text="${introduction != null ? introduction : '안녕하세요! 👋\n초보 개발자입니다.\n개발 공부하면서 배운 내용과\n일상, 여행 이야기를 기록합니다.'}">
+              안녕하세요! 👋<br />
+              초보 개발자입니다.<br />
+              개발 공부하면서 배운 내용과<br />
+              일상, 여행 이야기를 기록합니다.
+            </p>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <strong style="color:var(--text)">태그</strong>
+              <a sec:authorize="hasRole('ADMIN')" href="/member/tag-update"
+                style="background:var(--accent);color:#fff;padding:4px 12px;border-radius:4px;text-decoration:none;font-size:12px;font-weight:500">
+                수정
+              </a>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <span th:each="tag : ${#strings.arraySplit(tags != null ? tags : 'Java,Spring,MyBatis', ',')}"
+                th:if="${!#strings.isEmpty(#strings.trim(tag))}"
+                style="background:#e6f7ed;padding:6px 12px;border-radius:16px;color:var(--accent);font-size:13px;cursor:pointer">
+                <span th:text="'#' + ${#strings.trim(tag)}">#Java</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- 공지사항 카드: 태그 카드 바로 아래, 다른 섹션 침범 방지 위해 독립 카드로 구성 -->
+          <div class="card notice-card">
+            <div class="notice-card-header">
+              <strong style="color:var(--text)">공지사항</strong>
+              <div class="notice-actions">
+                <a href="/notice" class="notice-link">전체보기</a>
+                <a sec:authorize="hasRole('ADMIN')" href="/notice/write" class="notice-write">작성</a>
+              </div>
+            </div>
+            <ul class="notice-list">
+              <li class="notice-item" th:each="n : ${recentNotices}">
+                <span class="notice-dot"></span>
+                <a th:href="@{'/notice/' + ${n.id}}" th:text="${n.title}" class="notice-title">공지 제목</a>
+                <span th:text="${#temporals.format(n.createdAt, 'MM.dd')}" class="notice-date">10.29</span>
+              </li>
+              <li th:if="${#lists.isEmpty(recentNotices)}" class="notice-empty">
+                등록된 공지사항이 없습니다.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+
+      <section class="main">
+        <!-- 최신 글 섹션 -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+          <h2 style="margin:0;color:var(--text)">최신 글</h2>
+          <div style="color:var(--muted);font-size:14px">전체 <span th:text="${totalPosts}">0</span>개</div>
+        </div>
+
+        <div class="post-list">
+          <article class="post" th:each="post : ${recentPosts}" th:attr="data-href=@{'/posts/' + ${post.id}}"
+            role="link" tabindex="0" style="cursor:pointer">
+            <!-- 썸네일 이미지 또는 기본 이미지 -->
+            <div class="post-thumbnail"
+              style="width:100%;height:200px;border-radius:8px;overflow:hidden;margin-bottom:12px;background:#f5f5f5">
+              <img th:if="${post.thumbnailUrl != null && !#strings.isEmpty(post.thumbnailUrl)}"
+                th:src="${post.thumbnailUrl}" alt="썸네일" style="width:100%;height:100%;object-fit:cover"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div th:unless="${post.thumbnailUrl != null && !#strings.isEmpty(post.thumbnailUrl)}"
+                style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;font-size:18px;font-weight:500"
+                th:text="${post.category != null ? post.category : '일반'}">
+                카테고리
+              </div>
+            </div>
+            <h4>
+              <a th:href="@{'/posts/' + ${post.id}}" th:text="${post.title}"
+                style="color:var(--text);text-decoration:none">제목</a>
+            </h4>
+            <p style="margin:0;color:var(--muted);font-size:14px;line-height:1.5"
+              th:text="${#strings.length(post.content) > 80 ? #strings.substring(post.content, 0, 80) + '...' : post.content}">
+              내용 미리보기
+            </p>
+            <div class="meta">
+              <span th:text="${post.author}">작성자</span>
+              <span class="dot"></span>
+              <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">날짜</span>
+              <span class="dot"></span>
+              <span>읽음 <span th:text="${post.viewCount}">0</span></span>
+            </div>
+          </article>
+
+          <!-- 게시글이 없을 때 -->
+          <div th:if="${#lists.isEmpty(recentPosts)}" style="text-align:center;padding:60px 20px;color:var(--muted)">
+            <p>게시글이 없습니다.</p>
+          </div>
+        </div>
+
+        <!-- 인기 글 섹션 -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;margin-top:50px">
+          <h2 style="margin:0;color:var(--text)">인기 글</h2>
+          <div style="color:var(--muted);font-size:14px">조회수 순</div>
+        </div>
+
+        <div class="post-list">
+          <article class="post" th:each="post : ${popularPosts}" th:attr="data-href=@{'/posts/' + ${post.id}}"
+            role="link" tabindex="0" style="cursor:pointer">
+            <!-- 썸네일 이미지 또는 기본 이미지 -->
+            <div class="post-thumbnail"
+              style="width:100%;height:200px;border-radius:8px;overflow:hidden;margin-bottom:12px;background:#f5f5f5">
+              <img th:if="${post.thumbnailUrl != null && !#strings.isEmpty(post.thumbnailUrl)}"
+                th:src="${post.thumbnailUrl}" alt="썸네일" style="width:100%;height:100%;object-fit:cover"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div th:unless="${post.thumbnailUrl != null && !#strings.isEmpty(post.thumbnailUrl)}"
+                style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;font-size:18px;font-weight:500"
+                th:text="${post.category != null ? post.category : '일반'}">
+                카테고리
+              </div>
+            </div>
+            <h4>
+              <a th:href="@{'/posts/' + ${post.id}}" th:text="${post.title}"
+                style="color:var(--text);text-decoration:none">제목</a>
+            </h4>
+            <p style="margin:0;color:var(--muted);font-size:14px;line-height:1.5"
+              th:text="${#strings.length(post.content) > 80 ? #strings.substring(post.content, 0, 80) + '...' : post.content}">
+              내용 미리보기
+            </p>
+            <div class="meta">
+              <span th:text="${post.author}">작성자</span>
+              <span class="dot"></span>
+              <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">날짜</span>
+              <span class="dot"></span>
+              <span>읽음 <span th:text="${post.viewCount}">0</span></span>
+            </div>
+          </article>
+
+          <!-- 게시글이 없을 때 -->
+          <div th:if="${#lists.isEmpty(popularPosts)}" style="text-align:center;padding:60px 20px;color:var(--muted)">
+            <p>게시글이 없습니다.</p>
+          </div>
+        </div>
+
+        <div th:replace="~{fragments/footer :: footer}"></div>
+      </section>
+    </div>
+  </main>
+  <script>
+    // 카드 전체 클릭/Enter/Space로 상세로 이동
+    document.addEventListener('click', function (e) {
+      const card = e.target.closest('article.post[data-href]');
+      if (!card) return;
+      if (e.target.closest('a')) return; // 내부 링크 클릭은 그대로
+      const href = card.getAttribute('data-href');
+      if (href) window.location.href = href;
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const el = document.activeElement;
+      if (!el || !el.matches('article.post[data-href]')) return;
+      e.preventDefault();
+      const href = el.getAttribute('data-href');
+      if (href) window.location.href = href;
+    });
+  </script>
+</body>
+
+</html>

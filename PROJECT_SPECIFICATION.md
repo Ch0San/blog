@@ -106,13 +106,17 @@ Spring Boot 기반의 블로그 시스템으로, 게시글 작성, 댓글, 좋�
   - Thymeleaf Spring Security 6 통합
 
 #### Static Resources
-- **CSS**: `/static/css/style.css`
-- **JavaScript**: `/static/js/` (모듈화된 외부 스크립트)
+- 리소스 URL: `/css/**`, `/js/**`, `/images/**`, `/uploads/**`
+- **CSS**: `/css/style.css`
+- **JavaScript**: `/js/` (모듈화된 외부 스크립트)
   - `posts/detail.js` - 게시글 상세 (Kakao 지도, AJAX 좋아요)
   - `posts/edit.js` - 게시글 수정 (Kakao 지도)
   - `posts/write.js` - 게시글 작성 (Kakao 지도)
   - `stories/detail.js` - 스토리 AJAX 좋아요 및 댓글 좋아요
-- **Images**: `/static/images/`, `/uploads/images/`
+  - `stories/list.js` - 스토리 목록 동작 및 UI 보조
+  - `stories/edit.js` - 스토리 수정
+  - `stories/write.js` - 스토리 작성
+- **Images**: `/images/`(정적), `/uploads/images/`(업로드)
 - **Videos**: `/uploads/videos/`
 
 #### UI Components
@@ -127,8 +131,8 @@ Spring Boot 기반의 블로그 시스템으로, 게시글 작성, 댓글, 좋�
 
 #### External API
 - **Kakao Maps JavaScript API**
-  - API Key: `f13e5760c8998118422a52d43be57450`
-  - 게시글 작성/수정 시 지도 통합
+  - API Key: `kakao.maps.javascript.key` (application.properties에서 관리, 템플릿에 주입)
+  - 게시글 작성/수정/상세 화면에서 지도 통합
 
 ---
 
@@ -196,6 +200,7 @@ Spring Boot 기반의 블로그 시스템으로, 게시글 작성, 댓글, 좋�
 | is_public | BOOLEAN | DEFAULT TRUE | 공개 여부 |
 | thumbnail_url | VARCHAR(500) | NULL | 썸네일 이미지 URL |
 | video_url | VARCHAR(500) | NULL | 동영상 URL |
+| files_url | TEXT | NULL | 첨부파일경로 URL |
 | category | VARCHAR(50) | NULL | 카테고리 |
 | tags | VARCHAR(500) | NULL | 태그 (쉼표 구분) |
 | created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 작성일시 |
@@ -468,6 +473,8 @@ Spring Boot 기반의 블로그 시스템으로, 게시글 작성, 댓글, 좋�
 **비즈니스 규칙:**
 - Key-Value 형태의 사이트 설정 저장
 - 예: `site_tags` → "Java,Spring,MyBatis"
+- 예: `site_introduction` → 홈 소개 문구
+- 예: `site_hero_image_url` → 메인 히어로 이미지 URL
 
 ---
 
@@ -504,6 +511,7 @@ Spring Boot 기반의 블로그 시스템으로, 게시글 작성, 댓글, 좋�
   - 로그인 처리: POST `/member/signin`
   - 성공 시: `/`로 리다이렉트
   - 실패 시: `/member/signin?error`
+  - 로그아웃: `/member/signout` (성공 시 `/`)
 
 #### 비밀번호 인코더
 - **NoOpPasswordEncoder** (평문 저장)
@@ -514,18 +522,17 @@ Spring Boot 기반의 블로그 시스템으로, 게시글 작성, 댓글, 좋�
 | URL 패턴 | 접근 권한 |
 |---------|----------|
 | `/`, `/index.html` | permitAll |
-| `/css/**`, `/js/**`, `/images/**`, `/uploads/**` | permitAll |
-| `/member/signup`, `/member/signin` | permitAll |
-| `/stories/**` (GET) | permitAll |
-| `/posts`, `/posts/view/**` (GET) | permitAll |
-| `/notice`, `/notice/*` (GET) | permitAll |
+| `/css/**`, `/js/**`, `/images/**`, `/webjars/**`, `/uploads/**` | permitAll |
+| `/member/signup`, `/member/signin`, `/member/find-id`, `/member/find-password`, `/member/reset-password` | permitAll |
+| GET `/notice`, `/notice/{id}` | permitAll |
+| GET `/stories`, `/stories/{id}`, `/stories/search/**` | permitAll |
+| GET `/posts`, `/posts/{id}`, `/posts/search/**`, `/posts/download`, `/api/posts/**` | permitAll |
 | `/posts/write`, `/posts/edit/**`, `/posts/delete/**` | ADMIN만 |
 | `/stories/write`, `/stories/edit/**`, `/stories/delete/**` | ADMIN만 |
 | `/notice/write`, `/notice/edit/**`, `/notice/delete/**` | ADMIN만 |
 | `/member/update`, `/member/delete` | 인증 필요 |
-| `/member/tag-update`, `/member/list`, `/member/admin-edit` | ADMIN만 |
-| POST `/posts/*/comments`, `/posts/*/like` | 인증 필요 |
-| POST `/stories/*/comments`, `/stories/*/like` | 인증 필요 |
+| `/member/list`, `/member/admin/**`, `/member/tag-update`, `/admin/**` | ADMIN만 |
+| POST `/posts/*/comments`, `/posts/*/like`, `/comments/**`, `/replies/**` | 인증 필요 |
 
 #### Remember-Me
 - 활성화: 14일
@@ -559,6 +566,8 @@ blog/
 │   │   │   │   ├── StoryCommentLikeController.java
 │   │   │   │   ├── UploadController.java
 │   │   │   │   └── CustomErrorController.java
+│   │   │   │   ├── AdminSiteController.java
+│   │   │   │   └── AdminDebugController.java
 │   │   │   ├── domain/                           # 엔티티
 │   │   │   │   ├── Member.java
 │   │   │   │   ├── Post.java
@@ -613,10 +622,14 @@ blog/
 │   │       │   │   │   ├── edit.js              # 게시글 수정 (지도)
 │   │       │   │   │   └── write.js             # 게시글 작성 (지도)
 │   │       │   │   └── stories/
-│   │       │   │       └── detail.js            # 스토리 좋아요 AJAX
+│   │       │   │       ├── list.js              # 스토리 목록 동작
+│   │       │   │       ├── detail.js            # 스토리 좋아요 AJAX
+│   │       │   │       ├── edit.js              # 스토리 수정
+│   │       │   │       └── write.js             # 스토리 작성
 │   │       │   └── videos/                       # 업로드된 동영상
 │   │       └── templates/                        # Thymeleaf 템플릿
 │   │           ├── index.html
+│   │           ├── mainImageEdit.html            # 관리자 메인 히어로 이미지 관리
 │   │           ├── fragments/
 │   │           │   ├── header.html
 │   │           │   ├── footer.html
@@ -629,7 +642,10 @@ blog/
 │   │           │   ├── memberUpdate.html
 │   │           │   ├── adminEdit.html
 │   │           │   ├── list.html
-│   │           │   └── tagUpdate.html
+│   │           │   ├── tagUpdate.html
+│   │           │   ├── introductionUpdate.html
+│   │           │   ├── findId.html
+│   │           │   └── findPassword.html
 │   │           ├── posts/
 │   │           │   ├── list.html
 │   │           │   ├── detail.html
@@ -785,8 +801,8 @@ mvnw.cmd spring-boot:run
 - 파일 검증 로직 필요 (확장자, MIME 타입)
 
 ### 5. Kakao Maps API
-- API Key가 코드에 하드코딩되어 있음
-- 환경변수 또는 프로퍼티 파일로 관리 권장
+- API Key는 `application.properties`의 `kakao.maps.javascript.key`로 관리
+- 템플릿과 JS에서 주입/로딩하여 사용
 - API 사용량 제한 모니터링 필요
 
 ---

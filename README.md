@@ -1,5 +1,17 @@
 # 블로그 프로젝트 명세서
 
+> 배포직전테스트용 코멘트 (2025-10-29)
+>
+> - 이 문서는 배포 직전 최종 점검을 위한 테스트 코멘트를 포함합니다.
+> - 아래에 이번 커밋의 변경 내용을 요약했습니다.
+
+### 변경 내용 요약 (이번 커밋)
+- 명세서 상단에 "배포직전테스트용 코멘트" 배너 업데이트 및 변경사항 목록 보강
+- 공지사항(Notice) 게시판 기능 추가: 목록/상세 공개, 관리자만 작성/수정/삭제, 조회수 카운트, 홈(index) 최근 공지 위젯
+- DB 스키마에 notices 테이블 추가 및 test_data.sql에 샘플 13건 삽입
+- 최신 프로젝트 상태 반영 확인: DB 13개 테이블(notices 포함), 보안 URL 권한 표, 실행 방법, JS 모듈 구조
+- 오타/표현 통일 및 가독성 정리
+
 ## 📋 프로젝트 개요
 
 Spring Boot 기반의 블로그 시스템으로, 게시글 작성, 댓글, 좋아요, 동영상 콘텐츠(Stories) 등의 기능을 제공하는 웹 애플리케이션입니다.
@@ -184,6 +196,7 @@ Spring Boot 기반의 블로그 시스템으로, 게시글 작성, 댓글, 좋�
 | is_public | BOOLEAN | DEFAULT TRUE | 공개 여부 |
 | thumbnail_url | VARCHAR(500) | NULL | 썸네일 이미지 URL |
 | video_url | VARCHAR(500) | NULL | 동영상 URL |
+| files_url | TEXT | NULL | 첨부파일경로 URL |
 | category | VARCHAR(50) | NULL | 카테고리 |
 | tags | VARCHAR(500) | NULL | 태그 (쉼표 구분) |
 | created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 작성일시 |
@@ -857,8 +870,6 @@ mvnw.cmd spring-boot:run
 - JSON 응답 ({isLiked, likeCount})
 
 ### 데이터베이스 스키마
-- notices 테이블 추가
-- story_likes 테이블 추가
 - UNIQUE 제약조건 및 인덱스 최적화
 
 ---

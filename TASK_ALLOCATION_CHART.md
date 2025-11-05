@@ -1,12 +1,5 @@
 # 작업 할당 표 (Task Allocation Chart)
 
-본 문서는 블로그 프로젝트의 주요 작업을 역할별로 배분하고, 일정과 산출물을 추적하기 위한 표준 템플릿입니다. 팀 구성, 일정, 우선순위를 확정하기 전에 초기 초안으로 사용하세요.
-
-## 사용 방법
-- 담당자/역할/기간/상태/우선순위/의존성/산출물을 프로젝트 현실에 맞게 갱신합니다.
-- 상태 값 권장: Not Started | In Progress | Blocked | Review | Done
-- 우선순위 권장: High | Medium | Low
-
 ## 작업 분류 (Category)
 - DevOps: 빌드/배포/모니터링/인프라
 - Backend: API, 비즈니스 로직, 보안, 데이터 접근
@@ -15,7 +8,6 @@
 - QA: 테스트/시나리오/품질 보증
 
 ## 작업 표
-
 | ID | 작업 | 범주 | 담당자 | 역할 | 기간(시작–종료) | 상태 | 우선순위 | 의존성 | 산출물 |
 |----|------|------|--------|------|------------------|------|----------|--------|--------|
 | T01 | 프로젝트 초기 세팅 (Spring Boot, Maven Wrapper, DevTools) | DevOps | TBD | DevOps | TBD–TBD | Not Started | High | 없음 | 빌드 가능 스캐폴드 |
@@ -38,7 +30,3 @@
 | T18 | 접근성/반응형/크로스브라우저 점검 | Frontend | TBD | Frontend | TBD–TBD | Not Started | Low | T12 | 개선 체크리스트 |
 | T19 | 통합 테스트/QA 시나리오/버그 트래킹 | QA | TBD | QA | TBD–TBD | Not Started | High | T05–T14 | 테스트 케이스, 버그 리포트 |
 | T20 | 배포 파이프라인(CI/CD) 및 환경 구성 | DevOps | TBD | DevOps | TBD–TBD | Not Started | High | T01 | CI/CD 파이프라인, 프로필 분리 |
-
-## 메모
-- `project_planing.pdf`/`PROJECT_SPECIFICATION.md`의 최신 내용과 동기화하세요.
-- 팀원/마감이 확정되면 담당자, 기간, 상태를 우선 갱신하세요.

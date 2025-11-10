@@ -72,7 +72,8 @@
                     <div class="stories-thumbnail" style="position:relative;overflow:hidden;">
                         <!-- 썸네일 이미지가 있는 경우 -->
                         <img th:if="${story.thumbnailUrl != null and !story.thumbnailUrl.isEmpty()}"
-                            th:src="${story.thumbnailUrl}" th:alt="${story.title}" class="thumbnail-img" style="
+                            th:src="${#strings.startsWith(story.thumbnailUrl,'/') ? story.thumbnailUrl : '/' + story.thumbnailUrl}"
+                            th:alt="${story.title}" class="thumbnail-img" style="
                                 position:absolute;
                                 top:0;left:0;
                                 width:100%;
@@ -96,7 +97,8 @@
                                     pointer-events:none;
                                     transition:opacity .15s;
                                ">
-                            <source th:src="${story.videoUrl}" type="video/mp4" />
+                            <source th:src="${#strings.startsWith(story.videoUrl,'/') ? story.videoUrl : '/' + story.videoUrl}"
+                                    type="video/mp4" />
                         </video>
 
                         <!-- 썸네일/비디오 둘 다 없는 경우 -->

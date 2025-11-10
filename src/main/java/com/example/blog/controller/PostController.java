@@ -128,7 +128,11 @@ public class PostController {
         if (html == null || html.isEmpty()) {
             return "";
         }
-        return html.replaceAll("<[^>]*>", "").trim();
+        // 1) <script>, <style> 블록 전체 제거 (내용 포함)
+        String noScript = html.replaceAll("(?is)<script[^>]*>.*?</script>", "");
+        String noStyle = noScript.replaceAll("(?is)<style[^>]*>.*?</style>", "");
+        // 2) 나머지 모든 태그 제거 후 트림
+        return noStyle.replaceAll("<[^>]*>", "").trim();
     }
 
     // /posts?page=0 기반 (0부터 시작). 뷰에서는 1-based로 표시할 수 있음

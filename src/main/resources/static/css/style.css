@@ -1211,14 +1211,15 @@ footer {
   height: auto;
   display: block;
 }
-.post-content .resizable-media,
+.post-content img.resizable-media {
+  max-width: 100%;
+  height: auto;
+}
 .post-content .resizable-video,
 .post-content .kmap {
   max-width: 100%;
-  width: 100% !important;
 }
-.post-content .resizable-map {
-  width: 100% !important;
+ .post-content .resizable-map { 
   min-height: 240px;
 }
 .post-content table {
@@ -1759,3 +1760,6 @@ footer {
   color: var(--muted);
   font-size: 14px
 }
+
+
+

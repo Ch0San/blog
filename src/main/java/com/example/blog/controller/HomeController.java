@@ -141,6 +141,10 @@ public class HomeController {
         if (html == null) {
             return "";
         }
-        return html.replaceAll("<[^>]*>", "");
+        // 1) <script>와 <style> 블록 전체 제거 (내용 포함)
+        String noScript = html.replaceAll("(?is)<script[^>]*>.*?</script>", "");
+        String noStyle = noScript.replaceAll("(?is)<style[^>]*>.*?</style>", "");
+        // 2) 나머지 모든 태그 제거
+        return noStyle.replaceAll("<[^>]*>", "");
     }
 }

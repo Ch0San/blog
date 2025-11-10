@@ -14,6 +14,11 @@ import java.time.LocalDateTime;
  * 게시글에 달린 댓글 정보를 저장하는 테이블
  * 계층형 댓글 구조를 지원함 (대댓글 가능)
  */
+/**
+ * 댓글 엔티티.
+ *
+ * 게시글에 달린 댓글의 내용/작성자/상태와 계층 정보를 보관합니다.
+ */
 @Entity
 @Table(name = "comments")
 @Getter

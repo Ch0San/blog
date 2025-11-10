@@ -13,6 +13,11 @@ import java.util.stream.Collectors;
 /**
  * 스토리 댓글 좋아요 서비스
  */
+/**
+ * 스토리 댓글 좋아요 서비스.
+ *
+ * 좋아요 토글, 상태 확인, 개수 조회, 사용자가 좋아요한 스토리 댓글 ID 집합 조회를 제공합니다.
+ */
 @Service
 public class StoryCommentLikeService {
     private final StoryCommentLikeRepository storyCommentLikeRepository;
@@ -25,6 +30,13 @@ public class StoryCommentLikeService {
     }
 
     // 좋아요 토글 (있으면 취소, 없으면 추가)
+    /**
+     * 스토리 댓글 좋아요를 토글합니다.
+     *
+     * @param commentId 댓글 식별자
+     * @param username  사용자명
+     * @return 토글 후 좋아요 상태(true=좋아요)
+     */
     @Transactional
     public boolean toggleLike(Long commentId, String username) {
         StoryComment comment = storyCommentRepository.findById(commentId)
@@ -51,15 +63,28 @@ public class StoryCommentLikeService {
         }
     }
 
+    /**
+     * 사용자가 해당 스토리 댓글에 좋아요를 눌렀는지 확인합니다.
+     */
     public boolean isLiked(Long commentId, String username) {
         return storyCommentLikeRepository.existsByCommentIdAndUsername(commentId, username);
     }
 
+    /**
+     * 스토리 댓글 좋아요 수를 조회합니다.
+     */
     public long getLikeCount(Long commentId) {
         return storyCommentLikeRepository.countByCommentId(commentId);
     }
 
     // 스토리 내에서 사용자가 좋아요한 댓글 ID 집합
+    /**
+     * 특정 스토리에서 사용자가 좋아요한 댓글의 ID 집합을 조회합니다.
+     *
+     * @param storyId  스토리 식별자
+     * @param username 사용자명
+     * @return 댓글 ID 집합
+     */
     public Set<Long> getLikedCommentIdsForStory(Long storyId, String username) {
         return storyCommentLikeRepository.findAllByComment_Story_IdAndUsername(storyId, username)
                 .stream()

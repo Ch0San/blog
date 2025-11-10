@@ -30,6 +30,12 @@ import java.util.UUID;
 /**
  * 스토리(Stories) 게시판 컨트롤러
  */
+/**
+ * 스토리(Stories) 게시판 컨트롤러.
+ * 
+ * 목록/검색/상세 보기와 스토리 댓글의 생성·수정·삭제,
+ * 스토리 생성/수정/삭제 및 첨부파일(영상, 썸네일) 업로드/정리를 담당합니다.
+ */
 @Controller
 public class StoriesController {
     private final StoryService storyService;
@@ -48,6 +54,17 @@ public class StoriesController {
         this.storyLikeService = storyLikeService;
     }
 
+    /**
+     * 스토리 목록 페이지를 조회합니다.
+     * <p>
+     * 기본 페이지 크기는 12이며, 카테고리 필터가 지정되면 해당 카테고리로 필터링합니다.
+     * </p>
+     *
+     * @param page      0부터 시작하는 페이지 번호
+     * @param category  선택적 카테고리명(없으면 전체)
+     * @param model     뷰 렌더링에 사용할 모델
+     * @return 목록 뷰 이름(`stories/list`)
+     */
     @GetMapping("/stories")
     public String list(
             @RequestParam(defaultValue = "0") int page,
@@ -69,6 +86,15 @@ public class StoriesController {
     }
 
     // 스토리 검색
+    /**
+     * 스토리 검색 결과 목록을 조회합니다.
+     *
+     * @param field 검색 필드(`title`, `content`, `tags` 중 하나)
+     * @param q     검색어(없으면 빈 문자열)
+     * @param page  0부터 시작하는 페이지 번호
+     * @param model 뷰 렌더링에 사용할 모델
+     * @return 목록 뷰 이름(`stories/list`)
+     */
     @GetMapping("/stories/search")
     public String search(
             @RequestParam String field,
@@ -94,6 +120,17 @@ public class StoriesController {
     }
 
     // 스토리 상세보기
+    /**
+     * 스토리 상세 페이지를 조회합니다. 조회수는 1 증가합니다.
+     * <p>
+     * 인증된 사용자라면 사용자가 좋아요한 댓글/스토리 여부 정보를 함께 전달합니다.
+     * </p>
+     *
+     * @param id             스토리 식별자
+     * @param model          뷰 렌더링용 모델
+     * @param authentication 스프링 시큐리티 인증 정보(선택)
+     * @return 상세 뷰 이름(`stories/detail`), 존재하지 않으면 목록으로 리다이렉트
+     */
     @GetMapping("/stories/{id}")
     public String detail(@PathVariable Long id, Model model,
             org.springframework.security.core.Authentication authentication) {
@@ -122,6 +159,14 @@ public class StoriesController {
     }
 
     // 스토리 댓글 작성
+    /**
+     * 스토리에 댓글을 생성합니다.
+     *
+     * @param id           스토리 식별자
+     * @param content      댓글 내용(필수)
+     * @param userDetails  인증 사용자 정보(필수)
+     * @return 상세 페이지로 리다이렉트, 미인증 시 로그인 페이지로 리다이렉트
+     */
     @PostMapping("/stories/{id}/comments")
     public String createComment(
             @PathVariable Long id,
@@ -142,6 +187,14 @@ public class StoriesController {
     }
 
     // 스토리 댓글 삭제
+    /**
+     * 스토리 댓글을 삭제합니다. 작성자 본인만 삭제할 수 있습니다.
+     *
+     * @param commentId    댓글 식별자
+     * @param storyId      소속 스토리 식별자
+     * @param userDetails  인증 사용자 정보(필수)
+     * @return 상세 페이지로 리다이렉트. 권한 오류 시 `?error=메시지` 쿼리 파라미터 포함
+     */
     @PostMapping("/stories/comments/{commentId}/delete")
     public String deleteComment(
             @PathVariable Long commentId,
@@ -161,6 +214,15 @@ public class StoriesController {
     }
 
     // 스토리 댓글 수정
+    /**
+     * 스토리 댓글을 수정합니다. 작성자 본인만 수정할 수 있습니다.
+     *
+     * @param commentId    댓글 식별자
+     * @param content      변경할 내용
+     * @param storyId      소속 스토리 식별자
+     * @param userDetails  인증 사용자 정보(필수)
+     * @return 상세 페이지로 리다이렉트. 권한 오류 시 `?error=메시지` 쿼리 파라미터 포함
+     */
     @PostMapping("/stories/comments/{commentId}/update")
     public String updateComment(
             @PathVariable Long commentId,
@@ -181,12 +243,34 @@ public class StoriesController {
     }
 
     // 스토리 작성 페이지
+    /**
+     * 스토리 작성 폼을 표시합니다.
+     *
+     * @return 작성 폼 뷰 이름(`stories/write`)
+     */
     @GetMapping("/stories/write")
     public String writeForm() {
         return "stories/write";
     }
 
     // 스토리 저장
+    /**
+     * 새 스토리를 생성합니다. 선택적으로 영상/썸네일 파일 업로드를 처리합니다.
+     * <p>
+     * 업로드 파일은 `uploads/videos/`, `uploads/images/` 하위에 저장되며,
+     * 뷰에서 접근 가능한 URL(`/uploads/...`)을 반환합니다.
+     * </p>
+     *
+     * @param title         제목
+     * @param author        작성자 표시명
+     * @param description   설명/본문 요약
+     * @param category      선택적 카테고리
+     * @param tags          선택적 태그(구분자는 구현에 따름)
+     * @param videoFile     선택적 동영상 파일
+     * @param thumbnailFile 선택적 썸네일 이미지 파일
+     * @param model         에러 메시지 표시에 사용
+     * @return 생성 후 목록으로 리다이렉트, 업로드 실패 시 작성 폼으로 이동
+     */
     @PostMapping("/stories/write")
     public String write(
             @RequestParam String title,
@@ -244,6 +328,13 @@ public class StoriesController {
     }
 
     // 스토리 수정 페이지
+    /**
+     * 스토리 수정 폼을 표시합니다.
+     *
+     * @param id    스토리 식별자
+     * @param model 뷰 렌더링용 모델
+     * @return 수정 폼 뷰 이름(`stories/edit`), 존재하지 않으면 목록으로 리다이렉트
+     */
     @GetMapping("/stories/edit/{id}")
     public String editForm(@PathVariable Long id, Model model) {
         Story story = storyService.getStoryById(id);
@@ -255,6 +346,21 @@ public class StoriesController {
     }
 
     // 스토리 수정 처리
+    /**
+     * 스토리를 수정합니다. 선택적으로 영상/썸네일 교체 및 썸네일 삭제를 처리합니다.
+     *
+     * @param id             스토리 식별자
+     * @param title          제목
+     * @param author         작성자 표시명
+     * @param description    설명/본문 요약
+     * @param category       선택적 카테고리
+     * @param tags           선택적 태그
+     * @param videoFile      선택적 교체용 동영상 파일
+     * @param thumbnailFile  선택적 교체용 썸네일 이미지 파일
+     * @param deleteThumbnail 썸네일 삭제 여부(true 시 기존 파일 삭제)
+     * @param model          에러 메시지 표시에 사용
+     * @return 수정 후 상세로 리다이렉트, 실패 시 수정 폼으로 이동
+     */
     @PostMapping("/stories/edit/{id}")
     public String edit(
             @PathVariable Long id,
@@ -315,6 +421,11 @@ public class StoriesController {
     }
 
     // 동영상 파일 삭제 메서드 (URL 기반, uploads/videos 하위만 허용)
+    /**
+     * 동영상 파일을 URL 기준으로 삭제합니다. `uploads/videos` 하위에서만 동작합니다.
+     *
+     * @param existingUrl `/uploads/videos/...` 형식의 URL(그 외는 무시)
+     */
     private void deleteVideoFileByUrl(String existingUrl) {
         if (existingUrl == null || existingUrl.isBlank())
             return;
@@ -334,6 +445,12 @@ public class StoriesController {
     }
 
     // 동영상 파일 저장 메서드
+    /**
+     * 동영상 파일을 저장하고 접근 가능한 URL을 반환합니다.
+     *
+     * @param file 업로드된 동영상 파일
+     * @return `/uploads/videos/...` URL, 실패 시 빈 문자열
+     */
     private String saveVideoFile(MultipartFile file) {
         try {
             // 업로드 디렉토리 생성
@@ -365,6 +482,12 @@ public class StoriesController {
     }
 
     // 썸네일 이미지 파일 저장 메서드
+    /**
+     * 썸네일 이미지 파일을 저장하고 접근 가능한 URL을 반환합니다.
+     *
+     * @param file 업로드된 이미지 파일
+     * @return `/uploads/images/...` URL, 실패 시 빈 문자열
+     */
     private String saveThumbnailFile(MultipartFile file) {
         try {
             System.out.println("saveThumbnailFile 메서드 시작");
@@ -405,6 +528,11 @@ public class StoriesController {
     }
 
     // 이미지 파일 삭제 메서드 (URL 기반, uploads/images 하위만 허용)
+    /**
+     * 이미지 파일을 URL 기준으로 삭제합니다. `uploads/images` 하위에서만 동작합니다.
+     *
+     * @param existingUrl `/uploads/images/...` 형식의 URL(그 외는 무시)
+     */
     private void deleteImageFileByUrl(String existingUrl) {
         if (existingUrl == null || existingUrl.isBlank())
             return;
@@ -424,6 +552,12 @@ public class StoriesController {
     }
 
     // 스토리 삭제 (연관 동영상/썸네일 파일도 함께 삭제)
+    /**
+     * 스토리를 삭제합니다. 관련된 로컬 동영상/썸네일 파일도 함께 정리합니다.
+     *
+     * @param id 스토리 식별자
+     * @return 목록으로 리다이렉트
+     */
     @PostMapping("/stories/delete/{id}")
     public String delete(@PathVariable Long id) {
         Story story = storyService.getStoryById(id);

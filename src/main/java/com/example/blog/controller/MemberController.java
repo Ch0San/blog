@@ -20,6 +20,12 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * 회원 관련 컨트롤러
  */
+/**
+ * 회원 관리 컨트롤러.
+ *
+ * 회원 가입/로그인 페이지 노출, 정보 수정·삭제, 사이트 설정(소개/태그) 관리 및
+ * 관리자에 의한 회원 목록/권한 관리 등을 담당합니다.
+ */
 @Controller
 @RequestMapping("/member")
 public class MemberController {
@@ -32,12 +38,28 @@ public class MemberController {
     }
 
     // 회원가입 페이지
+    /**
+     * 회원 가입 폼을 표시합니다.
+     *
+     * @return 뷰 이름(`member/signUp`)
+     */
     @GetMapping("/signup")
     public String signupForm() {
         return "member/signUp";
     }
 
     // 회원가입 처리
+    /**
+     * 회원 가입을 처리합니다.
+     *
+     * @param username 아이디
+     * @param password 비밀번호(평문 전달, 서비스에서 인코딩 권장)
+     * @param nickname 닉네임
+     * @param email    이메일
+     * @param phoneNumber 전화번호(선택)
+     * @param address     주소(선택)
+     * @return 홈으로 리다이렉트
+     */
     @PostMapping("/signup")
     public String signup(
             @RequestParam String username,
@@ -60,12 +82,24 @@ public class MemberController {
     }
 
     // 로그인 페이지
+    /**
+     * 로그인 폼을 표시합니다.
+     *
+     * @return 뷰 이름(`member/signIn`)
+     */
     @GetMapping("/signin")
     public String signinForm() {
         return "member/signIn";
     }
 
     // 정보수정 페이지
+    /**
+     * 내 정보 수정 폼을 표시합니다.
+     *
+     * @param userDetails 인증 사용자
+     * @param model       뷰 렌더링용 모델
+     * @return 뷰 이름(`member/memberUpdate`)
+     */
     @GetMapping("/update")
     public String updateForm(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         String username = userDetails.getUsername();
@@ -75,6 +109,17 @@ public class MemberController {
     }
 
     // 정보수정 처리
+    /**
+     * 내 정보를 수정합니다.
+     *
+     * @param userDetails     인증 사용자
+     * @param currentPassword 현재 비밀번호(검증용)
+     * @param password        변경할 비밀번호(선택)
+     * @param email           이메일
+     * @param phoneNumber     전화번호(선택)
+     * @param address         주소(선택)
+     * @return 성공/실패 쿼리 파라미터와 함께 폼으로 리다이렉트
+     */
     @PostMapping("/update")
     public String update(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -107,6 +152,14 @@ public class MemberController {
     }
 
     // 회원 탈퇴 처리
+    /**
+     * 회원 탈퇴를 처리합니다. 세션 종료 및 remember-me 쿠키를 제거합니다.
+     *
+     * @param userDetails 인증 사용자(미인증이면 로그인으로 이동)
+     * @param request     HTTP 요청(로그아웃 처리)
+     * @param response    HTTP 응답(쿠키 제거)
+     * @return 홈으로 리다이렉트
+     */
     @PostMapping("/delete")
     public String deleteAccount(@AuthenticationPrincipal UserDetails userDetails,
             HttpServletRequest request,
@@ -135,6 +188,12 @@ public class MemberController {
     }
 
     // 태그 관리 페이지 (ADMIN 전용)
+    /**
+     * 사이트 태그 설정 폼(관리자).
+     *
+     * @param model 뷰 렌더링용 모델
+     * @return 뷰 이름(`member/tagUpdate`)
+     */
     @GetMapping("/tag-update")
     public String tagUpdateForm(Model model) {
         String tags = siteSettingService.getSetting("site_tags", "Java,Spring,MyBatis");
@@ -143,6 +202,12 @@ public class MemberController {
     }
 
     // 태그 저장 처리 (ADMIN 전용)
+    /**
+     * 사이트 태그 설정 저장(관리자).
+     *
+     * @param tags 콤마로 구분된 태그 목록
+     * @return 홈으로 리다이렉트(+표시용 쿼리)
+     */
     @PostMapping("/tag-update")
     public String tagUpdate(@RequestParam String tags) {
         siteSettingService.saveSetting("site_tags", tags, "사이트 태그 목록");
@@ -150,6 +215,12 @@ public class MemberController {
     }
 
     // 소개 관리 페이지 (ADMIN 전용)
+    /**
+     * 사이트 소개 설정 폼(관리자).
+     *
+     * @param model 뷰 렌더링용 모델
+     * @return 뷰 이름(`member/introductionUpdate`)
+     */
     @GetMapping("/introduction-update")
     public String introductionUpdateForm(Model model) {
         String introduction = siteSettingService.getSetting("site_introduction",
@@ -159,6 +230,12 @@ public class MemberController {
     }
 
     // 소개 저장 처리 (ADMIN 전용)
+    /**
+     * 사이트 소개 설정 저장(관리자).
+     *
+     * @param introduction 소개 문구(멀티라인 허용)
+     * @return 홈으로 리다이렉트(+표시용 쿼리)
+     */
     @PostMapping("/introduction-update")
     public String introductionUpdate(@RequestParam String introduction) {
         siteSettingService.saveSetting("site_introduction", introduction, "사이트 소개");
@@ -166,6 +243,12 @@ public class MemberController {
     }
 
     // 회원 목록 보기 (ADMIN 전용)
+    /**
+     * 회원 목록을 조회합니다(관리자).
+     *
+     * @param model 뷰 렌더링용 모델
+     * @return 뷰 이름(`member/list`)
+     */
     @GetMapping("/list")
     public String list(Model model) {
         java.util.List<Member> members = memberService.findAll();
@@ -174,6 +257,13 @@ public class MemberController {
     }
 
     // 회원 수정 폼 (ADMIN 전용)
+    /**
+     * 회원 관리 수정 폼(관리자).
+     *
+     * @param id    회원 식별자
+     * @param model 뷰 렌더링용 모델(역할 목록 포함)
+     * @return 뷰 이름(`member/adminEdit`), 없으면 목록으로 리다이렉트
+     */
     @GetMapping("/admin/edit/{id}")
     public String adminEditForm(@org.springframework.web.bind.annotation.PathVariable Long id, Model model) {
         Member member = memberService.findById(id);
@@ -186,6 +276,19 @@ public class MemberController {
     }
 
     // 회원 수정 처리 (ADMIN 전용)
+    /**
+     * 회원 관리 수정 처리(관리자).
+     *
+     * @param id         회원 식별자
+     * @param nickname   닉네임
+     * @param email      이메일
+     * @param phoneNumber 전화번호(선택)
+     * @param address    주소(선택)
+     * @param role       역할
+     * @param active     활성 여부
+     * @param password   새 비밀번호(선택; 제공 시 평문 -> 인코딩 필요)
+     * @return 목록으로 리다이렉트(+표시용 쿼리)
+     */
     @PostMapping("/admin/edit/{id}")
     public String adminEdit(
             @org.springframework.web.bind.annotation.PathVariable Long id,
@@ -214,6 +317,12 @@ public class MemberController {
     }
 
     // 회원 삭제 (ADMIN 전용)
+    /**
+     * 회원 삭제(관리자).
+     *
+     * @param id 회원 식별자
+     * @return 목록으로 리다이렉트(+표시용 쿼리)
+     */
     @PostMapping("/admin/delete/{id}")
     public String adminDelete(@org.springframework.web.bind.annotation.PathVariable Long id) {
         memberService.deleteById(id);

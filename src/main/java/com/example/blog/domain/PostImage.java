@@ -8,6 +8,11 @@ import lombok.Setter;
 /**
  * 게시글 다중 이미지 엔티티
  */
+/**
+ * 게시글 첨부 이미지 엔티티.
+ *
+ * 게시글과 N:1 연관, 정렬 순서/캡션/이미지 URL을 보관합니다.
+ */
 @Entity
 @Table(name = "post_images")
 @Getter

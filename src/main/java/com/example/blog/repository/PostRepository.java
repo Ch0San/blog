@@ -13,6 +13,11 @@ import java.util.Optional;
 /**
  * Post JPA Repository
  */
+/**
+ * Post 리포지토리.
+ *
+ * 페이징/검색/기간 조회, 이미지 fetch join 쿼리를 제공합니다.
+ */
 public interface PostRepository extends JpaRepository<Post, Long> {
     // 카테고리별 게시글 조회
     Page<Post> findByCategory(String category, Pageable pageable);

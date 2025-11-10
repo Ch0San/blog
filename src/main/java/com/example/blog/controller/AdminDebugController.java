@@ -17,6 +17,12 @@ import java.util.stream.Collectors;
  * 운영 전 점검용 간단한 디버그 API
  * 관리자(ROLE_ADMIN)만 접근 가능하도록 SecurityConfig의 경로 규칙(/member/admin/**)에 맞춘다.
  */
+/**
+ * 운영 점검용 간단 디버그 API.
+ *
+ * 관리자(ROLE_ADMIN)만 접근 가능하도록 보안 설정과 경로 규칙에 맞추어 노출됩니다.
+ * 최근 게시글/이미지/스토리의 미디어 URL 유효성 정보를 반환합니다.
+ */
 @RestController
 public class AdminDebugController {
     private final PostRepository postRepository;
@@ -31,6 +37,11 @@ public class AdminDebugController {
         this.storyRepository = storyRepository;
     }
 
+    /**
+     * 최근 미디어 URL 정보 조회(관리자).
+     *
+     * @return 게시글/이미지/스토리별 미디어 URL과 간단한 유효성 플래그
+     */
     @GetMapping("/member/admin/media-urls")
     public Map<String, Object> mediaUrls() {
         Map<String, Object> result = new HashMap<>();
@@ -75,6 +86,12 @@ public class AdminDebugController {
         return result;
     }
 
+    /**
+     * 미디어 URL의 형식이 로컬 업로드 경로 또는 http(s) URL인지 확인합니다.
+     *
+     * @param url 확인할 URL
+     * @return 유효하면 true
+     */
     private boolean isOk(String url) {
         if (url == null || url.isBlank())
             return false;

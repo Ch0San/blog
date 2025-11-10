@@ -19,6 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 관리자 사이트 설정 컨트롤러.
+ *
+ * 메인 히어로 이미지 업로드/선택/삭제와 현재 설정값 표시를 담당합니다.
+ */
 @Controller
 @RequestMapping("/admin/site")
 public class AdminSiteController {
@@ -29,6 +34,13 @@ public class AdminSiteController {
         this.siteSettingService = siteSettingService;
     }
 
+    /**
+     * 히어로 이미지 편집 페이지를 표시합니다.
+     * 저장된 최신 hero_*.{ext} 파일 목록을 함께 제공합니다.
+     *
+     * @param model 뷰 렌더링용 모델
+     * @return 뷰 이름(`mainImageEdit`)
+     */
     @GetMapping("/hero-image")
     public String heroImageEditPage(Model model) {
         String currentUrl = siteSettingService.getSetting("site_hero_image_url", "/images/index_image.jpg");
@@ -55,6 +67,12 @@ public class AdminSiteController {
         return "mainImageEdit";
     }
 
+    /**
+     * 히어로 이미지를 업로드하고 공개 URL을 설정값으로 저장합니다.
+     *
+     * @param file 이미지 파일(확장자/콘텐츠 타입 검증)
+     * @return 편집 페이지로 리다이렉트(+상태 쿼리)
+     */
     @PostMapping("/hero-image")
     public String uploadHeroImage(@RequestParam("file") MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
@@ -109,6 +127,12 @@ public class AdminSiteController {
         return "redirect:/admin/site/hero-image?updated=1";
     }
 
+    /**
+     * 히어로 이미지 파일을 삭제합니다. 현재 설정된 이미지인 경우 기본값으로 되돌립니다.
+     *
+     * @param url 삭제할 이미지의 `/uploads/images/hero_...` URL
+     * @return 편집 페이지로 리다이렉트(+상태 쿼리)
+     */
     @PostMapping("/hero-image/delete")
     public String deleteHeroImage(@RequestParam("url") String url) {
         if (url == null || url.isBlank()) {

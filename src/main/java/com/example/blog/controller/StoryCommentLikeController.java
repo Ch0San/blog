@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 /**
  * 스토리 댓글 좋아요 컨트롤러
  */
+/**
+ * 스토리 댓글 좋아요 컨트롤러.
+ *
+ * AJAX 요청으로 스토리 댓글 좋아요 토글과 현재 좋아요 수를 반환합니다.
+ */
 @Controller
 public class StoryCommentLikeController {
     private final StoryCommentLikeService storyCommentLikeService;
@@ -18,6 +23,13 @@ public class StoryCommentLikeController {
     }
 
     // 스토리 댓글 좋아요 토글 (AJAX)
+    /**
+     * 스토리 댓글 좋아요를 토글합니다(인증 필요).
+     *
+     * @param commentId 댓글 식별자
+     * @param authentication 인증 정보(사용자 식별)
+     * @return `isLiked`, `likeCount`를 포함한 JSON 응답
+     */
     @PostMapping("/stories/comments/{commentId}/like")
     @org.springframework.web.bind.annotation.ResponseBody
     public org.springframework.http.ResponseEntity<java.util.Map<String, Object>> toggleLike(

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDateTime;
 
 /**
- * Story JPA Repository
+ * Story 리포지토리.
  */
 public interface StoryRepository extends JpaRepository<Story, Long> {
     // 카테고리별 스토리 조회

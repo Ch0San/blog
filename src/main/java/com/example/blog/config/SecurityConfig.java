@@ -14,6 +14,11 @@ import org.springframework.security.web.SecurityFilterChain;
  * Spring Security 설정 클래스
  * 웹 보안 및 인증/인가 규칙을 정의합니다.
  */
+/**
+ * Spring Security 설정 클래스.
+ *
+ * 접근 제어 규칙, 로그인/로그아웃, remember-me 설정 등을 구성합니다.
+ */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {

@@ -13,6 +13,11 @@ import java.util.stream.Collectors;
 /**
  * 댓글 좋아요 서비스
  */
+/**
+ * 댓글 좋아요 서비스.
+ *
+ * 좋아요 토글, 상태 확인, 개수 조회, 사용자가 좋아요한 댓글 ID 집합 조회를 제공합니다.
+ */
 @Service
 public class CommentLikeService {
     private final CommentLikeRepository commentLikeRepository;
@@ -24,6 +29,13 @@ public class CommentLikeService {
     }
 
     // 좋아요 토글 (있으면 취소, 없으면 추가)
+    /**
+     * 댓글 좋아요를 토글합니다.
+     *
+     * @param commentId 댓글 식별자
+     * @param username  사용자명
+     * @return 토글 후 좋아요 상태(true=좋아요)
+     */
     @Transactional
     public boolean toggleLike(Long commentId, String username) {
         Comment comment = commentRepository.findById(commentId)
@@ -50,11 +62,25 @@ public class CommentLikeService {
         }
     }
 
+    /**
+     * 사용자가 해당 댓글에 좋아요를 눌렀는지 확인합니다.
+     *
+     * @param commentId 댓글 식별자
+     * @param username  사용자명
+     * @return 좋아요 여부
+     */
     public boolean isLiked(Long commentId, String username) {
         return commentLikeRepository.existsByCommentIdAndUsername(commentId, username);
     }
 
     // 게시글 내에서 사용자가 좋아요한 댓글 ID 집합
+    /**
+     * 특정 게시글에서 사용자가 좋아요한 댓글의 ID 집합을 조회합니다.
+     *
+     * @param postId   게시글 식별자
+     * @param username 사용자명
+     * @return 댓글 ID 집합
+     */
     public Set<Long> getLikedCommentIdsForPost(Long postId, String username) {
         return commentLikeRepository.findAllByComment_Post_IdAndUsername(postId, username)
                 .stream()
@@ -63,6 +89,12 @@ public class CommentLikeService {
     }
 
     // 댓글 좋아요 수 조회
+    /**
+     * 댓글 좋아요 수를 조회합니다.
+     *
+     * @param commentId 댓글 식별자
+     * @return 좋아요 수
+     */
     public long getLikeCount(Long commentId) {
         return commentLikeRepository.countByCommentId(commentId);
     }

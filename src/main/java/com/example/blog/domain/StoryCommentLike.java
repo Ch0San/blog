@@ -12,6 +12,11 @@ import java.time.LocalDateTime;
  * 스토리 댓글 좋아요 엔티티
  * 사용자와 스토리 댓글 간의 좋아요 관계를 저장합니다.
  */
+/**
+ * 스토리 댓글 좋아요 엔티티.
+ *
+ * 사용자-스토리댓글 간 좋아요 관계를 저장합니다(복합 유니크 제약).
+ */
 @Entity
 @Table(name = "story_comment_likes", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "comment_id", "username" })

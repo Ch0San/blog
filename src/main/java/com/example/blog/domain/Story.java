@@ -7,6 +7,11 @@ import java.time.LocalDateTime;
  * Story(Shorts) 엔티티
  * 동영상 기반의 짧은 콘텐츠
  */
+/**
+ * 스토리(Shorts) 엔티티.
+ *
+ * 영상 기반의 짧은 콘텐츠 정보와 공개/통계 필드를 보관합니다.
+ */
 @Entity
 @Table(name = "stories")
 public class Story {

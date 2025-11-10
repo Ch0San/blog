@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 /**
  * 모든 뷰에서 현재 로그인한 회원 정보를 사용할 수 있도록 주입하는 어드바이스
  */
+/**
+ * 전역 모델 속성 주입기.
+ *
+ * 모든 뷰에 현재 로그인 회원 정보와 Kakao JS 키를 주입합니다.
+ */
 @ControllerAdvice
 @Component
 public class GlobalModelAttributes {

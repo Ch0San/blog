@@ -25,6 +25,13 @@ public class UploadController {
     private static final long MAX_IMAGE_SIZE = 4L * 1024 * 1024; // 4MB
     private static final String TEMP_UPLOADS_KEY = "tempUploadedImages";
 
+    /**
+     * 에디터 이미지 1개를 업로드합니다.
+     *
+     * @param file    업로드할 이미지 파일(최대 4MB)
+     * @param session 임시 업로드 목록을 보관할 세션
+     * @return 업로드된 이미지의 접근 URL(`/uploads/images/...`)
+     */
     @PostMapping(path = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file, HttpSession session) {
@@ -69,6 +76,13 @@ public class UploadController {
 
     /**
      * 임시 업로드된 이미지 정리: 실제 사용된 이미지 제외하고 삭제
+     */
+    /**
+     * 임시 업로드된 이미지 정리: 본문에서 사용되지 않은 항목을 삭제합니다.
+     *
+     * @param usedImagesParam 콤마로 구분된 사용된 이미지 URL 목록(선택)
+     * @param session         세션에 보관된 임시 업로드 목록
+     * @return 삭제 개수 또는 상태 메시지
      */
     @PostMapping("/cleanup")
     @ResponseBody

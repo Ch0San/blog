@@ -1,4 +1,4 @@
-// Kakao Maps SDK 동적 주입
+﻿/*\n * posts/edit.js\n * - 글 수정 화면의 라이브 미리보기/툴바(굵게/기울임/정렬/색상/폰트) 처리\n * - 이미지/썸네일 미리보기, 썸네일 버튼(이미지 hover) 등록\n * - Kakao Maps SDK 동적 주입\n */\n// Kakao Maps SDK 동적 주입
 (function () {
     var metaEl = document.querySelector('meta[name="kakao-js-key"]');
     var key = metaEl ? metaEl.getAttribute('content') : '';
@@ -10,7 +10,7 @@
     var s = document.createElement('script'); s.src = url; s.async = true; s.id = 'kakao-sdk';
     s.onerror = function () { console.error('[Kakao SDK] failed to load:', url); };
     document.head.appendChild(s);
-    // 진단용: 콘솔에 URL 일부 로그(키 마스킹)
+    // 吏꾨떒?? 肄섏넄??URL ?쇰? 濡쒓렇(??留덉뒪??
     try {
         var masked = key.slice(0, 4) + '***' + key.slice(-4);
         console.log('[Kakao SDK] injecting sdk.js with key=', masked);
@@ -36,32 +36,32 @@ const tbFontSize = document.getElementById('tb-fontSize');
 const preview = document.getElementById('livePreview');
 const textarea = document.getElementById('content');
 
-// 현재 선택된 서식 상태 저장
+// 현재 ?좏깮???쒖떇 ?곹깭 ???
 let currentFontFamily = '';
 let currentFontSize = '';
 let currentColor = '';
 
-// 미리보기 형식에서 바로 작성 (고정 모드)
+// 誘몃━蹂닿린 ?뺤떇?먯꽌 諛붾줈 ?묒꽦 (怨좎젙 紐⑤뱶)
 preview.setAttribute('contenteditable', 'true');
 preview.classList.add('editing');
 
-// 기존 내용을 미리보기에 로드
+// 湲곗〈 ?댁슜??誘몃━蹂닿린??濡쒕뱶
 if (textarea.value && textarea.value.trim()) {
     preview.innerHTML = textarea.value;
 }
 preview.focus();
 
-// 미리보기에서 타이핑하면 숨은 textarea에 HTML 동기화 (폼 전송용)
+// 誘몃━蹂닿린?먯꽌 ??댄븨?섎㈃ ?⑥? textarea??HTML ?숆린??(???꾩넚??
 preview.addEventListener('input', () => {
     textarea.value = preview.innerHTML;
 });
 
-// 에디터 내 이미지에 마우스 오버 시 썸네일 지정 버튼 표시
+// ?먮뵒?????대?吏??留덉슦???ㅻ쾭 ???몃꽕??吏??踰꾪듉 ?쒖떆
 let thumbnailBtn = null;
 
 preview.addEventListener('mouseover', (e) => {
     if (e.target.tagName === 'IMG') {
-        // 기존 버튼 제거
+        // 湲곗〈 踰꾪듉 ?쒓굅
         if (thumbnailBtn && thumbnailBtn.parentNode) {
             thumbnailBtn.remove();
         }
@@ -70,9 +70,9 @@ preview.addEventListener('mouseover', (e) => {
         const rect = img.getBoundingClientRect();
         const previewRect = preview.getBoundingClientRect();
 
-        // 썸네일 버튼 생성
+        // ?몃꽕??踰꾪듉 ?앹꽦
         thumbnailBtn = document.createElement('button');
-        thumbnailBtn.textContent = '썸네일';
+        thumbnailBtn.textContent = '?몃꽕??;
         thumbnailBtn.type = 'button';
         thumbnailBtn.style.cssText = `
             position: absolute;
@@ -95,13 +95,13 @@ preview.addEventListener('mouseover', (e) => {
             const thumbnailInput = document.getElementById('thumbnailUrl');
             if (thumbnailInput) {
                 thumbnailInput.value = img.src;
-                // URL로 썸네일 지정 시: 파일 입력 비우고 삭제 체크 해제
+                // URL濡??몃꽕??吏???? ?뚯씪 ?낅젰 鍮꾩슦怨???젣 泥댄겕 ?댁젣
                 try {
                     if (thumbnailFileInput) thumbnailFileInput.value = '';
                     const deleteThumbnailCheckbox = document.getElementById('deleteThumbnail');
                     if (deleteThumbnailCheckbox) deleteThumbnailCheckbox.checked = false;
                 } catch (_) {}
-                // 미리보기 갱신
+                // 誘몃━蹂닿린 媛깆떊
                 try {
                     const previewBox = document.getElementById('thumbnailPreview');
                     if (previewBox) {
@@ -110,17 +110,17 @@ preview.addEventListener('mouseover', (e) => {
                         wrapper.className = 'current-thumbnail';
                         const label = document.createElement('span');
                         label.className = 'thumbnail-preview-label';
-                        label.textContent = '현재 썸네일:';
+                        label.textContent = '현재 ?몃꽕??';
                         const thumbImg = document.createElement('img');
                         thumbImg.className = 'thumbnail-preview-image';
                         thumbImg.src = img.src;
-                        thumbImg.alt = '현재 썸네일';
+                        thumbImg.alt = '현재 ?몃꽕??;
                         wrapper.appendChild(label);
                         wrapper.appendChild(thumbImg);
                         previewBox.appendChild(wrapper);
                     }
-                } catch (e) { console.warn('썸네일 미리보기 갱신 실패', e); }
-                alert('썸네일 URL로 등록되었습니다: ' + img.src);
+                } catch (e) { console.warn('?몃꽕??誘몃━蹂닿린 媛깆떊 ?ㅽ뙣', e); }
+                alert('?몃꽕??URL濡??깅줉?섏뿀?듬땲?? ' + img.src);
             }
         });
 
@@ -131,7 +131,7 @@ preview.addEventListener('mouseover', (e) => {
 
 preview.addEventListener('mouseout', (e) => {
     if (e.target.tagName === 'IMG') {
-        // 버튼 영역으로 마우스가 이동한 경우는 유지
+        // 踰꾪듉 ?곸뿭?쇰줈 留덉슦?ㅺ? ?대룞??寃쎌슦???좎?
         if (thumbnailBtn && e.relatedTarget === thumbnailBtn) {
             return;
         }
@@ -146,7 +146,7 @@ if (fileInput) {
     fileInput.addEventListener('change', function () {
         const files = Array.from(this.files || []);
         if (!files.length) {
-            previewList.innerHTML = '<p style="color:#666;font-size:13px">선택된 파일이 없습니다.</p>';
+            previewList.innerHTML = '<p style="color:#666;font-size:13px">?좏깮???뚯씪???놁뒿?덈떎.</p>';
             return;
         }
 
@@ -154,14 +154,14 @@ if (fileInput) {
         const max = 10 * 1024 * 1024; // 10MB per file
         files.forEach((f, idx) => {
             if (f.size > max) {
-                alert(`파일(#${idx + 1}) 크기가 10MB를 초과했습니다.`);
+                alert(`?뚯씪(#${idx + 1}) ?ш린媛 10MB瑜?珥덇낵?덉뒿?덈떎.`);
                 return;
             }
             const item = document.createElement('div');
             item.style.cssText = 'padding:8px;border:1px solid #dcdde1;border-radius:6px;background:#f8f9fa;font-size:13px;display:flex;align-items:center;gap:8px';
 
             const icon = document.createElement('span');
-            icon.textContent = '📎';
+            icon.textContent = '?뱨';
             icon.style.fontSize = '16px';
 
             const name = document.createElement('span');
@@ -175,7 +175,7 @@ if (fileInput) {
     });
 }
 
-// 썸네일 이미지 미리보기 (썸네일 파일 교체 시 동작)
+// ?몃꽕???대?吏 誘몃━蹂닿린 (?몃꽕???뚯씪 援먯껜 ???숈옉)
 if (thumbnailFileInput) {
     thumbnailFileInput.addEventListener('change', function () {
         const deleteThumbnailCheckbox = document.getElementById('deleteThumbnail');
@@ -183,32 +183,31 @@ if (thumbnailFileInput) {
 
         if (!file) return;
 
-        // 새 파일을 선택하면 삭제 체크박스 자동 해제
+        // ???뚯씪???좏깮?섎㈃ ??젣 泥댄겕諛뺤뒪 ?먮룞 ?댁젣
         if (deleteThumbnailCheckbox) {
             deleteThumbnailCheckbox.checked = false;
         }
 
         thumbnailPreview.innerHTML = '';
 
-        // 파일 크기 체크 (10MB)
+        // ?뚯씪 ?ш린 泥댄겕 (10MB)
         if (file.size > 10 * 1024 * 1024) {
-            alert('이미지 파일 크기가 10MB를 초과합니다.\n현재 파일 크기: ' + (file.size / 1024 / 1024).toFixed(2) + 'MB');
+            alert('?대?吏 ?뚯씪 ?ш린媛 10MB瑜?珥덇낵?⑸땲??\n현재 ?뚯씪 ?ш린: ' + (file.size / 1024 / 1024).toFixed(2) + 'MB');
             this.value = '';
             return;
         }
 
-        // URL 기반 썸네일을 사용 중이었다면 초기화
-        const thumbnailInput = document.getElementById('thumbnailUrl');
+        // URL 湲곕컲 ?몃꽕?쇱쓣 ?ъ슜 以묒씠?덈떎硫?珥덇린??        const thumbnailInput = document.getElementById('thumbnailUrl');
         if (thumbnailInput) thumbnailInput.value = '';
 
-        // 미리보기 표시
+        // 誘몃━蹂닿린 ?쒖떆
         const previewContainer = document.createElement('div');
         previewContainer.style.cssText = 'border:1px solid #e6e8eb;border-radius:6px;padding:10px;background:#f8f9fa';
 
         const fileInfo = document.createElement('div');
         fileInfo.innerHTML = `
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-                <span style="font-size:20px">🖼️</span>
+                <span style="font-size:20px">?뼹截?/span>
                 <div>
                     <div style="font-weight:500;color:var(--text)">${file.name}</div>
                     <div style="font-size:12px;color:var(--muted)">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
@@ -216,7 +215,7 @@ if (thumbnailFileInput) {
             </div>
         `;
 
-        // 이미지 미리보기
+        // ?대?吏 誘몃━蹂닿린
         const img = document.createElement('img');
         img.style.cssText = 'width:100%;max-width:400px;border-radius:6px';
         img.src = URL.createObjectURL(file);
@@ -227,29 +226,27 @@ if (thumbnailFileInput) {
     });
 }
 
-// 삭제 체크박스 이벤트
+// ??젣 泥댄겕諛뺤뒪 ?대깽??
 const deleteThumbnailCheckbox = document.getElementById('deleteThumbnail');
 if (deleteThumbnailCheckbox) {
     deleteThumbnailCheckbox.addEventListener('change', function () {
         const currentThumbnail = document.getElementById('currentThumbnail');
         if (this.checked) {
-            // 체크하면 현재 썸네일에 반투명 효과
+            // 泥댄겕?섎㈃ 현재 ?몃꽕?쇱뿉 諛섑닾紐??④낵
             if (currentThumbnail) {
                 currentThumbnail.classList.add('delete-pending');
                 const overlay = document.createElement('div');
                 overlay.id = 'deleteOverlay';
                 overlay.className = 'delete-overlay';
-                overlay.innerHTML = '<span class="delete-badge">삭제 예정</span>';
+                overlay.innerHTML = '<span class="delete-badge">??젣 ?덉젙</span>';
                 currentThumbnail.appendChild(overlay);
             }
-            // 파일 선택 초기화
-            if (thumbnailFileInput) thumbnailFileInput.value = '';
-            // URL 기반 썸네일도 해제
+            // ?뚯씪 ?좏깮 珥덇린??            if (thumbnailFileInput) thumbnailFileInput.value = '';
+            // URL 湲곕컲 ?몃꽕?쇰룄 ?댁젣
             const thumbnailInput = document.getElementById('thumbnailUrl');
             if (thumbnailInput) thumbnailInput.value = '';
         } else {
-            // 체크 해제하면 원래대로
-            if (currentThumbnail) {
+            // 泥댄겕 ?댁젣?섎㈃ ?먮옒?濡?            if (currentThumbnail) {
                 currentThumbnail.classList.remove('delete-pending');
                 const overlay = document.getElementById('deleteOverlay');
                 if (overlay) overlay.remove();
@@ -258,7 +255,7 @@ if (deleteThumbnailCheckbox) {
     });
 }
 
-// 폼 제출 직전: 본문 HTML 동기화 보강 (혹시 누락 방지)
+// ???쒖텧 吏곸쟾: 蹂몃Ц HTML ?숆린??蹂닿컯 (?뱀떆 ?꾨씫 諛⑹?)
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('form.editor-form');
     if (form) {
@@ -293,31 +290,31 @@ function sanitizeHtml(html) {
     return safe;
 }
 
-// contenteditable에 HTML 삽입 (본문 영역에만)
+// contenteditable??HTML ?쎌엯 (蹂몃Ц ?곸뿭?먮쭔)
 function insertHtmlAtCursor(html) {
-    // 에디터 본문에 포커스 설정
+    // ?먮뵒??蹂몃Ц???ъ빱???ㅼ젙
     preview.focus();
 
     let sel, range;
     if (window.getSelection) {
         sel = window.getSelection();
 
-        // 선택 영역이 preview 내부인지 확인
+        // ?좏깮 ?곸뿭??preview ?대??몄? ?뺤씤
         if (sel.rangeCount > 0) {
             range = sel.getRangeAt(0);
             const container = range.commonAncestorContainer;
             const isInPreview = preview.contains(container.nodeType === 3 ? container.parentNode : container);
 
-            // preview 내부가 아니면 preview 끝에 삽입
+            // preview ?대?媛 ?꾨땲硫?preview ?앹뿉 ?쎌엯
             if (!isInPreview) {
                 range = document.createRange();
                 range.selectNodeContents(preview);
-                range.collapse(false); // 끝으로 이동
+                range.collapse(false); // ?앹쑝濡??대룞
                 sel.removeAllRanges();
                 sel.addRange(range);
             }
         } else {
-            // 선택 영역이 없으면 preview 끝에 삽입
+            // ?좏깮 ?곸뿭???놁쑝硫?preview ?앹뿉 ?쎌엯
             range = document.createRange();
             range.selectNodeContents(preview);
             range.collapse(false);
@@ -345,17 +342,17 @@ function insertHtmlAtCursor(html) {
             }
         }
     }
-    // textarea에도 동기화
+    // textarea?먮룄 ?숆린??
     textarea.value = preview.innerHTML;
 }
 
-// 에디터에 입력 시 현재 서식 적용
+// ?먮뵒?곗뿉 ?낅젰 ??현재 ?쒖떇 ?곸슜
 preview.addEventListener('keypress', (e) => {
     if (currentFontFamily || currentFontSize || currentColor) {
         e.preventDefault();
 
         const char = e.key;
-        if (char.length === 1) { // 일반 문자만
+        if (char.length === 1) { // ?쇰컲 臾몄옄留?
             const span = document.createElement('span');
             if (currentFontFamily) span.style.fontFamily = currentFontFamily;
             if (currentFontSize) span.style.fontSize = currentFontSize;
@@ -378,7 +375,7 @@ preview.addEventListener('keypress', (e) => {
     }
 });
 
-// 텍스트 서식 적용 함수
+// ?띿뒪???쒖떇 ?곸슜 ?⑥닔
 function wrapSelectionWithTag(tagName, styles = {}) {
     const sel = window.getSelection();
     if (!sel.rangeCount) return;
@@ -387,7 +384,7 @@ function wrapSelectionWithTag(tagName, styles = {}) {
     const selectedText = range.toString();
 
     if (!selectedText) {
-        // 텍스트 선택 없으면 앞으로 입력될 텍스트에 적용
+        // ?띿뒪???좏깮 ?놁쑝硫??욎쑝濡??낅젰???띿뒪?몄뿉 ?곸슜
         return true;
     }
 
@@ -401,7 +398,7 @@ function wrapSelectionWithTag(tagName, styles = {}) {
         span.textContent = selectedText;
         range.insertNode(span);
 
-        // 커서를 span 뒤로 이동
+        // 而ㅼ꽌瑜?span ?ㅻ줈 ?대룞
         range.setStartAfter(span);
         range.collapse(true);
         sel.removeAllRanges();
@@ -415,13 +412,13 @@ function wrapSelectionWithTag(tagName, styles = {}) {
     }
 }
 
-// 텍스트 서식 툴바 동작
+// ?띿뒪???쒖떇 ?대컮 ?숈옉
 if (tbBold) {
     tbBold.addEventListener('click', () => {
         preview.focus();
         document.execCommand('bold', false, null);
         textarea.value = preview.innerHTML;
-        // 활성 상태 토글
+        // ?쒖꽦 ?곹깭 ?좉?
         tbBold.classList.toggle('active');
     });
 }
@@ -430,7 +427,7 @@ if (tbItalic) {
         preview.focus();
         document.execCommand('italic', false, null);
         textarea.value = preview.innerHTML;
-        // 활성 상태 토글
+        // ?쒖꽦 ?곹깭 ?좉?
         tbItalic.classList.toggle('active');
     });
 }
@@ -439,11 +436,11 @@ if (tbUnderline) {
         preview.focus();
         document.execCommand('underline', false, null);
         textarea.value = preview.innerHTML;
-        // 활성 상태 토글
+        // ?쒖꽦 ?곹깭 ?좉?
         tbUnderline.classList.toggle('active');
     });
 }
-// 글자 색상
+// 湲???됱긽
 if (tbColor) {
     tbColor.addEventListener('change', (e) => {
         preview.focus();
@@ -467,7 +464,7 @@ if (tbFontFamily) {
             currentFontFamily = e.target.value;
             const noSelection = wrapSelectionWithTag('span', { fontFamily: e.target.value });
             if (noSelection) {
-                // 선택된 텍스트 없으면 서식 적용 표시
+                // ?좏깮???띿뒪???놁쑝硫??쒖떇 ?곸슜 ?쒖떆
                 tbFontFamily.style.backgroundColor = '#e3f2fd';
             }
         } else {
@@ -483,7 +480,7 @@ if (tbFontSize) {
             currentFontSize = e.target.value;
             const noSelection = wrapSelectionWithTag('span', { fontSize: e.target.value });
             if (noSelection) {
-                // 선택된 텍스트 없으면 서식 적용 표시
+                // ?좏깮???띿뒪???놁쑝硫??쒖떇 ?곸슜 ?쒖떆
                 tbFontSize.style.backgroundColor = '#e3f2fd';
             }
         } else {
@@ -493,7 +490,7 @@ if (tbFontSize) {
     });
 }
 
-// 정렬 적용 (선택 영역을 블록으로 감싸거나, 빈 블록 삽입)
+// ?뺣젹 ?곸슜 (?좏깮 ?곸뿭??釉붾줉?쇰줈 媛먯떥嫄곕굹, 鍮?釉붾줉 ?쎌엯)
 function applyAlignment(align) {
     preview.focus();
     const sel = window.getSelection();
@@ -506,14 +503,14 @@ function applyAlignment(align) {
             const contents = range.extractContents();
             wrapper.appendChild(contents);
             range.insertNode(wrapper);
-            // 커서를 wrapper 뒤로 이동
+            // 而ㅼ꽌瑜?wrapper ?ㅻ줈 ?대룞
             sel.removeAllRanges();
             const newRange = document.createRange();
             newRange.setStartAfter(wrapper);
             newRange.collapse(true);
             sel.addRange(newRange);
         } else {
-            // 선택이 없으면 정렬 블록 삽입
+            // ?좏깮???놁쑝硫??뺣젹 釉붾줉 ?쎌엯
             insertHtmlAtCursor(`<div style=\"text-align:${align}\"><br></div>`);
         }
         textarea.value = preview.innerHTML;
@@ -525,7 +522,7 @@ if (tbAlignLeft) tbAlignLeft.addEventListener('click', () => applyAlignment('lef
 if (tbAlignCenter) tbAlignCenter.addEventListener('click', () => applyAlignment('center'));
 if (tbAlignRight) tbAlignRight.addEventListener('click', () => applyAlignment('right'));
 
-// 툴바 동작
+// ?대컮 ?숈옉
 if (tbImage) {
     tbImage.addEventListener('click', () => {
         const inlineInput = document.getElementById('inlineImageUpload');
@@ -534,10 +531,10 @@ if (tbImage) {
 }
 if (tbVideo) {
     tbVideo.addEventListener('click', () => {
-        const url = prompt('동영상 URL을 입력하세요 (YouTube, 직접 업로드 등)');
+        const url = prompt('?숈쁺??URL???낅젰?섏꽭??(YouTube, 吏곸젒 ?낅줈????');
         if (url) {
             let videoHtml = '';
-            // YouTube URL 처리
+            // YouTube URL 泥섎━
             if (url.includes('youtube.com') || url.includes('youtu.be')) {
                 let videoId = '';
                 if (url.includes('youtu.be/')) {
@@ -549,19 +546,19 @@ if (tbVideo) {
                     videoHtml = `<div class="resizable-media resizable-video" style="position:relative;width:640px;max-width:100%;margin:16px auto;cursor:nwse-resize;display:block" data-video-id="${videoId}"><div style="padding-bottom:56.25%;position:relative"><iframe src="https://www.youtube.com/embed/${videoId}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:8px" allowfullscreen></iframe></div></div>`;
                 }
             } else {
-                // 일반 비디오 URL (mp4, webm 등)
-                videoHtml = `<div class="resizable-media resizable-video" style="width:640px;max-width:100%;margin:16px auto;cursor:nwse-resize;display:block"><video controls style="width:100%;border-radius:8px;display:block"><source src="${url}" type="video/mp4">브라우저가 비디오를 지원하지 않습니다.</video></div>`;
+                // ?쇰컲 鍮꾨뵒??URL (mp4, webm ??
+                videoHtml = `<div class="resizable-media resizable-video" style="width:640px;max-width:100%;margin:16px auto;cursor:nwse-resize;display:block"><video controls style="width:100%;border-radius:8px;display:block"><source src="${url}" type="video/mp4">釉뚮씪?곗?媛 鍮꾨뵒?ㅻ? 吏?먰븯吏 ?딆뒿?덈떎.</video></div>`;
             }
             if (videoHtml) {
                 insertHtmlAtCursor(videoHtml);
             } else {
-                insertHtmlAtCursor(`<p>동영상: <a href="${url}" target="_blank">${url}</a></p>`);
+                insertHtmlAtCursor(`<p>?숈쁺?? <a href="${url}" target="_blank">${url}</a></p>`);
             }
         }
     });
 }
 
-// Kakao 지도: SDK 준비 대기
+// Kakao 吏?? SDK 以鍮??湲?
 function ensureKakaoReady(cb) {
     if (window.kakao && kakao.maps && typeof kakao.maps.load === 'function') {
         kakao.maps.load(cb);
@@ -574,7 +571,7 @@ function ensureKakaoReady(cb) {
             kakao.maps.load(cb);
         } else if ((waited += 100) > 15000) {
             clearInterval(t);
-            alert('카카오 지도 SDK 로딩 실패\n- JavaScript 키/도메인 등록을 확인하세요.');
+            alert('移댁뭅??吏??SDK 濡쒕뵫 ?ㅽ뙣\n- JavaScript ???꾨찓???깅줉???뺤씤?섏꽭??');
         }
     }, 100);
 }
@@ -588,13 +585,13 @@ function renderKakaoMap(containerId, lat, lng) {
 }
 function insertKakaoMapBlock(lat, lng, label) {
     const id = 'kmap-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-    const caption = label ? `<div style=\"font-size:12px;color:#666;margin-top:4px;\">📍 ${label}</div>` : '';
+    const caption = label ? `<div style=\"font-size:12px;color:#666;margin-top:4px;\">?뱧 ${label}</div>` : '';
     const html = `\n<div class=\"kmap resizable-media\" style=\"margin:8px 0;max-width:100%;width:100%\">\n  <div id=\"${id}\" class=\"resizable-map\" style=\"width:100%;height:320px;border-radius:8px;border:1px solid #e6e8eb;cursor:nwse-resize;\"></div>\n  ${caption}\n</div>\n<script>(function(){if(!window.kakao||!kakao.maps){return;}var c=document.getElementById('${id}');if(!c)return;var map=new kakao.maps.Map(c,{center:new kakao.maps.LatLng(${lat},${lng}),level:3});var marker=new kakao.maps.Marker({position:new kakao.maps.LatLng(${lat},${lng})});marker.setMap(map);}());<\/script>\n`;
     insertHtmlAtCursor(html);
     ensureKakaoReady(() => renderKakaoMap(id, lat, lng));
 }
 
-// 지도 선택 모달 로직 (수정)
+// 吏???좏깮 紐⑤떖 濡쒖쭅 (?섏젙)
 const mapModal = document.getElementById('mapModalEdit');
 const mapBackdrop = document.getElementById('mapModalBackdropEdit');
 const mapClose = document.getElementById('mapModalCloseEdit');
@@ -628,7 +625,7 @@ function setPicked(lat, lng, label) {
     pickedLatLng = { lat, lng };
     pickedLabel = label || (lat + ', ' + lng);
     mapInsertBtn.disabled = false;
-    mapPickedInfo.textContent = `선택된 위치: ${pickedLabel} (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+    mapPickedInfo.textContent = `?좏깮???꾩튂: ${pickedLabel} (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
     if (pickerMarker) {
         pickerMarker.setPosition(new kakao.maps.LatLng(lat, lng));
         pickerMarker.setMap(pickerMap);
@@ -654,7 +651,7 @@ function keywordSearch(q) {
             const lat = parseFloat(d.y), lng = parseFloat(d.x);
             setPicked(lat, lng, d.place_name);
         } else {
-            alert('검색 결과가 없습니다. 지도를 클릭해 직접 선택하세요.');
+            alert('寃??寃곌낵媛 ?놁뒿?덈떎. 吏?꾨? ?대┃??吏곸젒 ?좏깮?섏꽭??');
         }
     });
 }
@@ -665,13 +662,13 @@ mapSearchBtn.addEventListener('click', () => keywordSearch(mapSearchInput.value.
 mapSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); keywordSearch(mapSearchInput.value.trim()); } });
 mapInsertBtn.addEventListener('click', () => { if (!pickedLatLng) return; insertKakaoMapBlock(pickedLatLng.lat, pickedLatLng.lng, pickedLabel); closeMapModal(); });
 
-// AJAX 업로드 설정
+// AJAX ?낅줈???ㅼ젙
 const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
 const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content') || 'X-CSRF-TOKEN';
 const imageUrlsField = document.getElementById('imageUrls');
 const gathered = [];
 
-// 업로드된 이미지 추적
+// ?낅줈?쒕맂 ?대?吏 異붿쟻
 const uploadedImages = new Set();
 let isCancelling = false;
 let cleanupSent = false;
@@ -700,20 +697,20 @@ document.getElementById('inlineImageUpload').addEventListener('change', async (e
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
-    // 본문 영역에 포커스가 없으면 경고
+    // 蹂몃Ц ?곸뿭???ъ빱?ㅺ? ?놁쑝硫?寃쎄퀬
     const sel = window.getSelection();
     const focusNode = sel.focusNode;
     const isInPreview = focusNode && (focusNode === preview || preview.contains(focusNode));
 
     if (!isInPreview) {
-        alert('본문 영역을 클릭한 후 이미지를 삽입해주세요.');
+        alert('蹂몃Ц ?곸뿭???대┃?????대?吏瑜??쎌엯?댁＜?몄슂.');
         e.target.value = '';
         return;
     }
 
     for (const f of files) {
         if (f.size > 4 * 1024 * 1024) {
-            alert('이미지 크기가 4MB를 초과했습니다.');
+            alert('?대?吏 ?ш린媛 4MB瑜?珥덇낵?덉뒿?덈떎.');
             continue;
         }
         const fd = new FormData();
@@ -726,30 +723,30 @@ document.getElementById('inlineImageUpload').addEventListener('change', async (e
             });
             const data = await res.json();
             if (!res.ok) {
-                alert('업로드 실패: ' + (data.error || res.status));
+                alert('?낅줈???ㅽ뙣: ' + (data.error || res.status));
                 continue;
             }
             const url = data.url;
             const imgHtml = `<img src="${url}" alt="image" class="resizable-media" style="max-width:100%;cursor:move" draggable="false"><br>`;
             insertHtmlAtCursor(imgHtml);
             gathered.push(url);
-            uploadedImages.add(url); // 추적 목록에 추가
+            uploadedImages.add(url); // 異붿쟻 紐⑸줉??異붽?
             imageUrlsField.value = gathered.join(',');
         } catch (err) {
-            alert('업로드 중 오류가 발생했습니다.');
+            alert('?낅줈??以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.');
         }
     }
     e.target.value = '';
 });
 
-// 페이지 이탈 시 사용되지 않은 임시 이미지 정리
+// ?섏씠吏 ?댄깉 ???ъ슜?섏? ?딆? ?꾩떆 ?대?吏 ?뺣━
 window.addEventListener('beforeunload', () => {
     if (uploadedImages.size > 0 && !cleanupSent) {
         sendCleanup({ keepUsed: !isCancelling });
     }
 });
 
-// 취소 버튼 클릭 시 모든 임시 업로드 삭제 후 상세 화면으로 이동
+// 痍⑥냼 踰꾪듉 ?대┃ ??紐⑤뱺 ?꾩떆 ?낅줈????젣 ???곸꽭 ?붾㈃?쇰줈 ?대룞
 document.addEventListener('DOMContentLoaded', () => {
     const cancelBtn = document.querySelector('.form-actions .btn.btn-secondary');
     if (cancelBtn) {
@@ -766,13 +763,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 미디어 리사이징 기능
+// 誘몃뵒??由ъ궗?댁쭠 湲곕뒫
 let isResizing = false;
 let currentElement = null;
 let startX, startY, startWidth, startHeight;
 let resizeIndicator = null;
 
-// 크기 표시 인디케이터 생성
+// ?ш린 ?쒖떆 ?몃뵒耳?댄꽣 ?앹꽦
 function showResizeIndicator(element, width, height, mouseX, mouseY) {
     if (!resizeIndicator) {
         resizeIndicator = document.createElement('div');
@@ -791,7 +788,7 @@ function showResizeIndicator(element, width, height, mouseX, mouseY) {
         document.body.appendChild(resizeIndicator);
     }
 
-    resizeIndicator.textContent = `${Math.round(width)}px × ${Math.round(height)}px`;
+    resizeIndicator.textContent = `${Math.round(width)}px 횞 ${Math.round(height)}px`;
     resizeIndicator.style.left = mouseX + 'px';
     resizeIndicator.style.top = mouseY + 'px';
     resizeIndicator.style.display = 'block';
@@ -806,7 +803,7 @@ function hideResizeIndicator() {
 preview.addEventListener('mousedown', (e) => {
     const target = e.target;
 
-    // 이미지 리사이징
+    // ?대?吏 由ъ궗?댁쭠
     if (target.tagName === 'IMG' && target.classList.contains('resizable-media')) {
         isResizing = true;
         currentElement = target;
@@ -816,7 +813,7 @@ preview.addEventListener('mousedown', (e) => {
         e.preventDefault();
     }
 
-    // 비디오 컨테이너 리사이징 (YouTube iframe wrapper 또는 video wrapper)
+    // 鍮꾨뵒??而⑦뀒?대꼫 由ъ궗?댁쭠 (YouTube iframe wrapper ?먮뒗 video wrapper)
     if (target.closest('.resizable-video')) {
         const videoContainer = target.closest('.resizable-video');
         isResizing = true;
@@ -827,7 +824,7 @@ preview.addEventListener('mousedown', (e) => {
         e.preventDefault();
     }
 
-    // 지도 리사이징
+    // 吏??由ъ궗?댁쭠
     if (target.classList.contains('resizable-map') || target.closest('.resizable-map')) {
         const mapContainer = target.classList.contains('resizable-map') ? target : target.closest('.resizable-map');
         isResizing = true;
@@ -846,19 +843,19 @@ document.addEventListener('mousemove', (e) => {
     const deltaX = e.clientX - startX;
 
     if (currentElement.tagName === 'IMG') {
-        // 이미지 크기 조절
+        // ?대?吏 ?ш린 議곗젅
         const newWidth = Math.max(100, Math.min(startWidth + deltaX, preview.offsetWidth));
         currentElement.style.width = newWidth + 'px';
         currentElement.style.maxWidth = 'none';
         showResizeIndicator(currentElement, newWidth, currentElement.offsetHeight, e.clientX, e.clientY);
     } else if (currentElement.classList.contains('resizable-video')) {
-        // 비디오 크기 조절
+        // 鍮꾨뵒???ш린 議곗젅
         const newWidth = Math.max(200, Math.min(startWidth + deltaX, preview.offsetWidth));
         const newHeight = newWidth * 9 / 16;
         currentElement.style.width = newWidth + 'px';
         showResizeIndicator(currentElement, newWidth, newHeight, e.clientX, e.clientY);
     } else if (currentElement.classList.contains('resizable-map')) {
-        // 지도 크기 조절 (너비와 높이)
+        // 吏???ш린 議곗젅 (?덈퉬? ?믪씠)
         const deltaY = e.clientY - startY;
         const newWidth = Math.max(200, Math.min(startWidth + deltaX, preview.offsetWidth));
         const newHeight = Math.max(200, startHeight + deltaY);
@@ -878,3 +875,6 @@ document.addEventListener('mouseup', () => {
         hideResizeIndicator();
     }
 });
+
+
+

@@ -9,6 +9,9 @@ import java.util.List;
 /**
  * 스토리 댓글 리포지토리
  */
+/**
+ * 스토리 댓글 리포지토리.
+ */
 @Repository
 public interface StoryCommentRepository extends JpaRepository<StoryComment, Long> {
     /**

@@ -1,6 +1,4 @@
-// Kakao Maps SDK 동적 주입
-(function () {
-    var metaEl = document.querySelector('meta[name="kakao-js-key"]');
+﻿/*`n * posts/write.js`n * - 글 작성 화면의 라이브 미리보기/툴바 처리 및 파일/이미지 업로드 프리뷰`n * - 임시 업로드 이미지 추적 및 정리, Kakao Maps SDK 동적 주입`n */`n// Kakao Maps SDK 동적 주입`n    var metaEl = document.querySelector('meta[name="kakao-js-key"]');
     var key = metaEl ? metaEl.getAttribute('content') : '';
     if (!key) {
         console.error('[Kakao SDK] kakaoJsKey is empty. Set property kakao.maps.javascript.key');
@@ -21,14 +19,14 @@
     };
     document.head.appendChild(s);
 
-    // 진단 로그 (키 마스킹)
+    // 吏꾨떒 濡쒓렇 (??留덉뒪??
     try {
         var masked = key.slice(0, 4) + '***' + key.slice(-4);
         console.log('[Kakao SDK] injecting sdk.js with key=', masked);
     } catch (_) {}
 })();
 
-// 주요 엘리먼트 캐싱
+// 二쇱슂 ?섎━癒쇳듃 罹먯떛
 const postForm = document.getElementById('postForm');
 const fileInput = document.getElementById('imageFiles');
 const previewList = document.getElementById('imagePreviewList');
@@ -56,28 +54,28 @@ const imageUrlsField = document.getElementById('imageUrls');
 const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
 const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content') || 'X-CSRF-TOKEN';
 
-// 에디터 상태
+// ?먮뵒???곹깭
 let currentFontFamily = '';
 let currentFontSize = '';
 let currentColor = '';
 
-// 업로드된 이미지들 추적
-const gathered = [];           // 서버에서 돌려준 url들 모아 input[name=imageUrls]로 보낼 리스트
-const uploadedImages = new Set(); // 임시 업로드된 URL들
+// ?낅줈?쒕맂 ?대?吏??異붿쟻
+const gathered = [];           // ?쒕쾭?먯꽌 ?뚮젮以 url??紐⑥븘 input[name=imageUrls]濡?蹂대궪 由ъ뒪??
+const uploadedImages = new Set(); // ?꾩떆 ?낅줈?쒕맂 URL??
 let isCancelling = false;
 let cleanupSent = false;
 
-// 초기 세팅
+// 珥덇린 ?명똿
 preview.setAttribute('contenteditable', 'true');
 preview.classList.add('editing');
 preview.focus();
 
-// 에디터에서 내용 바뀔 때마다 textarea에 동기화
+// ?먮뵒?곗뿉???댁슜 諛붾??뚮쭏??textarea???숆린??
 preview.addEventListener('input', () => {
     textarea.value = preview.innerHTML;
 });
 
-// === 썸네일 지정 버튼 로직 ===
+// === ?몃꽕??吏??踰꾪듉 濡쒖쭅 ===
 let thumbnailBtn = null;
 preview.addEventListener('mouseover', (e) => {
     if (e.target.tagName === 'IMG') {
@@ -114,12 +112,12 @@ preview.addEventListener('mouseover', (e) => {
             if (thumbnailInput) {
                 thumbnailInput.value = img.src;
 
-                // 파일로 선택 중이었다면 파일 선택 해제
+                // ?뚯씪濡??좏깮 以묒씠?덈떎硫??뚯씪 ?좏깮 ?댁젣
                 try {
                     if (thumbnailFileInput) thumbnailFileInput.value = '';
                 } catch (_) {}
 
-                // 썸네일 미리보기 갱신
+                // ?몃꽕??誘몃━蹂닿린 媛깆떊
                 try {
                     if (thumbnailPreview) {
                         thumbnailPreview.innerHTML = '';
@@ -128,7 +126,7 @@ preview.addEventListener('mouseover', (e) => {
 
                         const label = document.createElement('span');
                         label.className = 'thumbnail-preview-label';
-                        label.textContent = '현재 썸네일:';
+                        label.textContent = '현재 썸네일';
 
                         const thumbImg = document.createElement('img');
                         thumbImg.className = 'thumbnail-preview-image';
@@ -140,10 +138,10 @@ preview.addEventListener('mouseover', (e) => {
                         thumbnailPreview.appendChild(wrapper);
                     }
                 } catch (err) {
-                    console.warn('썸네일 미리보기 갱신 실패', err);
+                    console.warn('?몃꽕??誘몃━蹂닿린 媛깆떊 ?ㅽ뙣', err);
                 }
 
-                alert('썸네일로 등록되었습니다.');
+                alert('?몃꽕?쇰줈 ?깅줉?섏뿀?듬땲??');
             }
         });
 
@@ -155,7 +153,7 @@ preview.addEventListener('mouseover', (e) => {
 preview.addEventListener('mouseout', (e) => {
     if (e.target.tagName === 'IMG') {
         if (thumbnailBtn && e.relatedTarget === thumbnailBtn) {
-            return; // 버튼 위로 마우스 올라갔으면 유지
+            return; // 踰꾪듉 ?꾨줈 留덉슦???щ씪媛붿쑝硫??좎?
         }
         if (thumbnailBtn && thumbnailBtn.parentNode) {
             thumbnailBtn.remove();
@@ -164,12 +162,12 @@ preview.addEventListener('mouseout', (e) => {
     }
 });
 
-// === 첨부 파일(사이드바) 미리보기 ===
+// === 泥⑤? ?뚯씪(?ъ씠?쒕컮) 誘몃━蹂닿린 ===
 if (fileInput) {
     fileInput.addEventListener('change', function () {
         const files = Array.from(this.files || []);
         if (!files.length) {
-            previewList.innerHTML = '<p style="color:#666;font-size:13px">선택된 파일이 없습니다.</p>';
+            previewList.innerHTML = '<p style="color:#666;font-size:13px">?좏깮???뚯씪???놁뒿?덈떎.</p>';
             return;
         }
 
@@ -178,7 +176,7 @@ if (fileInput) {
 
         files.forEach((f, idx) => {
             if (f.size > max) {
-                alert(`파일(#${idx + 1}) 크기가 10MB를 초과했습니다.`);
+                alert(`?뚯씪(#${idx + 1}) ?ш린媛 10MB瑜?珥덇낵?덉뒿?덈떎.`);
                 return;
             }
 
@@ -187,7 +185,7 @@ if (fileInput) {
                 'padding:8px;border:1px solid #dcdde1;border-radius:6px;background:#f8f9fa;font-size:13px;display:flex;align-items:center;gap:8px';
 
             const icon = document.createElement('span');
-            icon.textContent = '📎';
+            icon.textContent = '?뱨';
             icon.style.fontSize = '16px';
 
             const name = document.createElement('span');
@@ -201,24 +199,24 @@ if (fileInput) {
     });
 }
 
-// 썸네일 파일 선택 시 미리보기 및 URL 해제
+// ?몃꽕???뚯씪 ?좏깮 ??誘몃━蹂닿린 諛?URL ?댁젣
 if (thumbnailFileInput) {
     thumbnailFileInput.addEventListener('change', function () {
         const file = this.files && this.files[0];
         if (!file) return;
 
-        // 10MB 제한
+        // 10MB ?쒗븳
         if (file.size > 10 * 1024 * 1024) {
-            alert('이미지 파일 크기가 10MB를 초과합니다.');
+            alert('?대?吏 ?뚯씪 ?ш린媛 10MB瑜?珥덇낵?⑸땲??');
             this.value = '';
             return;
         }
 
-        // URL 기반 썸네일 제거
+        // URL 湲곕컲 ?몃꽕???쒓굅
         const thumbnailInput = document.getElementById('thumbnailUrl');
         if (thumbnailInput) thumbnailInput.value = '';
 
-        // 미리보기 갱신
+        // 誘몃━蹂닿린 媛깆떊
         try {
             if (thumbnailPreview) {
                 thumbnailPreview.innerHTML = '';
@@ -227,12 +225,12 @@ if (thumbnailFileInput) {
 
                 const label = document.createElement('span');
                 label.className = 'thumbnail-preview-label';
-                label.textContent = '선택한 썸네일:';
+                label.textContent = '선택한 썸네일';
 
                 const img = document.createElement('img');
                 img.className = 'thumbnail-preview-image';
                 img.src = URL.createObjectURL(file);
-                img.alt = '선택한 썸네일';
+                img.alt = '?좏깮???몃꽕??;
 
                 wrapper.appendChild(label);
                 wrapper.appendChild(img);
@@ -242,12 +240,12 @@ if (thumbnailFileInput) {
     });
 }
 
-// === inline(본문) 이미지 업로드 ===
+// === inline(蹂몃Ц) ?대?吏 ?낅줈??===
 document.getElementById('inlineImageUpload').addEventListener('change', async (e) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
-    // 본문 포커스 확인
+    // 蹂몃Ц ?ъ빱???뺤씤
     const sel = window.getSelection();
     const focusNode = sel.focusNode;
     const isInPreview =
@@ -255,14 +253,14 @@ document.getElementById('inlineImageUpload').addEventListener('change', async (e
         (focusNode === preview || preview.contains(focusNode));
 
     if (!isInPreview) {
-        alert('본문 영역을 클릭한 후 이미지를 삽입해주세요.');
+        alert('蹂몃Ц ?곸뿭???대┃?????대?吏瑜??쎌엯?댁＜?몄슂.');
         e.target.value = '';
         return;
     }
 
     for (const f of files) {
         if (f.size > 4 * 1024 * 1024) {
-            alert('이미지 크기가 4MB를 초과했습니다.');
+            alert('?대?吏 ?ш린媛 4MB瑜?珥덇낵?덉뒿?덈떎.');
             continue;
         }
 
@@ -278,7 +276,7 @@ document.getElementById('inlineImageUpload').addEventListener('change', async (e
 
             const data = await res.json();
             if (!res.ok) {
-                alert('업로드 실패: ' + (data.error || res.status));
+                alert('?낅줈???ㅽ뙣: ' + (data.error || res.status));
                 continue;
             }
 
@@ -288,27 +286,27 @@ document.getElementById('inlineImageUpload').addEventListener('change', async (e
 
             insertHtmlAtCursor(imgHtml);
 
-            // 서버에서 받은 이미지 URL 추적
+            // ?쒕쾭?먯꽌 諛쏆? ?대?吏 URL 異붿쟻
             gathered.push(url);
             uploadedImages.add(url);
             imageUrlsField.value = gathered.join(',');
 
         } catch (err) {
-            alert('업로드 중 오류가 발생했습니다.');
+            alert('?낅줈??以??ㅻ쪟媛 諛쒖깮?덉뒿?덈떎.');
         }
     }
 
     e.target.value = '';
 });
 
-// === textarea에 HTML 삽입 도우미 ===
+// === textarea??HTML ?쎌엯 ?꾩슦誘?===
 function insertHtmlAtCursor(html) {
     preview.focus();
 
     let sel = window.getSelection();
     let range;
 
-    // 선택 영역이 preview 바깥이면 preview 끝으로 옮겨
+    // ?좏깮 ?곸뿭??preview 諛붽묑?대㈃ preview ?앹쑝濡???꺼
     if (sel && sel.rangeCount > 0) {
         range = sel.getRangeAt(0);
         const container = range.commonAncestorContainer;
@@ -358,7 +356,7 @@ function insertHtmlAtCursor(html) {
     textarea.value = preview.innerHTML;
 }
 
-// === 텍스트 스타일링 관련 ===
+// === ?띿뒪???ㅽ??쇰쭅 愿??===
 preview.addEventListener('keypress', (e) => {
     if (currentFontFamily || currentFontSize || currentColor) {
         e.preventDefault();
@@ -395,7 +393,7 @@ function wrapSelectionWithTag(tagName, styles = {}) {
     const range = sel.getRangeAt(0);
     const selectedText = range.toString();
     if (!selectedText) {
-        return true; // 아무 것도 선택 안 한 경우 -> 이후 타이핑 기본 스타일만 바꿔둠
+        return true; // ?꾨Т 寃껊룄 ?좏깮 ????寃쎌슦 -> ?댄썑 ??댄븨 湲곕낯 ?ㅽ??쇰쭔 諛붽퓭??
     }
 
     const span = document.createElement(tagName);
@@ -448,7 +446,7 @@ if (tbUnderline) {
     });
 }
 
-// 글자색
+// 湲?먯깋
 if (tbColor) {
     tbColor.addEventListener('change', (e) => {
         preview.focus();
@@ -466,7 +464,7 @@ if (tbColor) {
     });
 }
 
-// 글꼴
+// 湲瑗?
 if (tbFontFamily) {
     tbFontFamily.addEventListener('change', (e) => {
         preview.focus();
@@ -483,7 +481,7 @@ if (tbFontFamily) {
     });
 }
 
-// 글자 크기
+// 湲???ш린
 if (tbFontSize) {
     tbFontSize.addEventListener('change', (e) => {
         preview.focus();
@@ -500,7 +498,7 @@ if (tbFontSize) {
     });
 }
 
-// 정렬
+// ?뺣젹
 function applyAlignment(align) {
     preview.focus();
     const sel = window.getSelection();
@@ -535,7 +533,7 @@ if (tbAlignLeft) tbAlignLeft.addEventListener('click', () => applyAlignment('lef
 if (tbAlignCenter) tbAlignCenter.addEventListener('click', () => applyAlignment('center'));
 if (tbAlignRight) tbAlignRight.addEventListener('click', () => applyAlignment('right'));
 
-// 이미지 삽입 버튼
+// ?대?吏 ?쎌엯 踰꾪듉
 if (tbImage) {
     tbImage.addEventListener('click', () => {
         const inlineInput = document.getElementById('inlineImageUpload');
@@ -543,15 +541,15 @@ if (tbImage) {
     });
 }
 
-// 비디오 삽입 버튼
+// 鍮꾨뵒???쎌엯 踰꾪듉
 if (tbVideo) {
     tbVideo.addEventListener('click', () => {
-        const url = prompt('동영상 URL을 입력하세요 (YouTube, 직접 업로드 등)');
+        const url = prompt('?숈쁺??URL???낅젰?섏꽭??(YouTube, 吏곸젒 ?낅줈????');
         if (!url) return;
 
         let videoHtml = '';
 
-        // YouTube 추출
+        // YouTube 異붿텧
         if (url.includes('youtube.com') || url.includes('youtu.be')) {
             let videoId = '';
             if (url.includes('youtu.be/')) {
@@ -574,13 +572,13 @@ if (tbVideo) {
 </div>`;
             }
         } else {
-            // 일반 비디오 URL
+            // ?쇰컲 鍮꾨뵒??URL
             videoHtml = `
 <div class="resizable-media resizable-video"
      style="width:640px;max-width:100%;margin:16px auto;cursor:nwse-resize;display:block">
   <video controls style="width:100%;border-radius:8px;display:block">
     <source src="${url}" type="video/mp4">
-    브라우저가 비디오를 지원하지 않습니다.
+    釉뚮씪?곗?媛 鍮꾨뵒?ㅻ? 吏?먰븯吏 ?딆뒿?덈떎.
   </video>
 </div>`;
         }
@@ -589,18 +587,18 @@ if (tbVideo) {
             insertHtmlAtCursor(videoHtml);
         } else {
             insertHtmlAtCursor(
-                `<p>동영상: <a href="${url}" target="_blank">${url}</a></p>`
+                `<p>?숈쁺?? <a href="${url}" target="_blank">${url}</a></p>`
             );
         }
     });
 }
 
-// 지도 버튼
+// 吏??踰꾪듉
 if (tbMap) {
     tbMap.addEventListener('click', openMapModal);
 }
 
-// Kakao 지도 SDK 초기화 도우미
+// Kakao 吏??SDK 珥덇린???꾩슦誘?
 function ensureKakaoReady(cb) {
     if (window.kakao && kakao.maps && typeof kakao.maps.load === 'function') {
         kakao.maps.load(cb);
@@ -614,10 +612,10 @@ function ensureKakaoReady(cb) {
         } else if ((waited += 100) > 15000) {
             clearInterval(t);
             alert(
-                '카카오 지도 SDK 로딩 실패\n' +
-                '- JavaScript 키 확인\n' +
-                '- 현 도메인이 Kakao Developers에 등록됐는지 확인\n' +
-                '- 광고차단 플러그인 차단 여부 확인'
+                '移댁뭅??吏??SDK 濡쒕뵫 ?ㅽ뙣\n' +
+                '- JavaScript ???뺤씤\n' +
+                '- ???꾨찓?몄씠 Kakao Developers???깅줉?먮뒗吏 ?뺤씤\n' +
+                '- 愿묎퀬李⑤떒 ?뚮윭洹몄씤 李⑤떒 ?щ? ?뺤씤'
             );
         }
     }, 100);
@@ -638,11 +636,11 @@ function renderKakaoMap(containerId, lat, lng) {
     marker.setMap(map);
 }
 
-// 본문에 지도 블럭 삽입
+// 蹂몃Ц??吏??釉붾윮 ?쎌엯
 function insertKakaoMapBlock(lat, lng, label) {
     const id = 'kmap-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
     const caption = label
-        ? `<div style="font-size:12px;color:#666;margin-top:4px;">📍 ${label}</div>`
+        ? `<div style="font-size:12px;color:#666;margin-top:4px;">?뱧 ${label}</div>`
         : '';
     const html = `
 <div class="kmap resizable-media" style="margin:8px 0;max-width:100%;width:100%">
@@ -673,7 +671,7 @@ marker.setMap(map);
     ensureKakaoReady(() => renderKakaoMap(id, lat, lng));
 }
 
-// 지도 모달 관련 DOM
+// 吏??紐⑤떖 愿??DOM
 const mapModal = document.getElementById('mapModal');
 const mapBackdrop = document.getElementById('mapModalBackdrop');
 const mapClose = document.getElementById('mapModalClose');
@@ -691,7 +689,7 @@ function openMapModal() {
         if (!pickerMap) {
             const container = document.getElementById('kmap-picker');
             pickerMap = new kakao.maps.Map(container, {
-                center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 시청 근처
+                center: new kakao.maps.LatLng(37.5665, 126.9780), // ?쒖슱 ?쒖껌 洹쇱쿂
                 level: 5
             });
             pickerMarker = new kakao.maps.Marker();
@@ -720,7 +718,7 @@ function setPicked(lat, lng, label) {
 
     mapInsertBtn.disabled = false;
     mapPickedInfo.textContent =
-        `선택된 위치: ${pickedLabel} (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+        `?좏깮???꾩튂: ${pickedLabel} (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
 
     if (pickerMarker) {
         pickerMarker.setPosition(new kakao.maps.LatLng(lat, lng));
@@ -754,7 +752,7 @@ function keywordSearch(q) {
             const lng = parseFloat(d.x);
             setPicked(lat, lng, d.place_name);
         } else {
-            alert('검색 결과가 없습니다. 지도를 클릭해 직접 선택하세요.');
+            alert('寃??寃곌낵媛 ?놁뒿?덈떎. 吏?꾨? ?대┃??吏곸젒 ?좏깮?섏꽭??');
         }
     });
 }
@@ -779,19 +777,19 @@ mapInsertBtn.addEventListener('click', () => {
     closeMapModal();
 });
 
-// === 임시 업로드된 이미지 정리(sendBeacon) 관련 ===
+// === ?꾩떆 ?낅줈?쒕맂 ?대?吏 ?뺣━(sendBeacon) 愿??===
 function sendCleanup({ keepUsed }) {
     if (cleanupSent) return;
 
     const params = new URLSearchParams();
     if (keepUsed) {
-        // 본문(html)에 실제로 사용된 이미지만 남기고 나머지는 삭제하라고 알림
+        // 蹂몃Ц(html)???ㅼ젣濡??ъ슜???대?吏留??④린怨??섎㉧吏????젣?섎씪怨??뚮┝
         const contentHtml = preview.innerHTML;
         const usedImages = Array.from(uploadedImages)
             .filter(url => contentHtml.includes(url));
         params.append('usedImages', usedImages.join(','));
     } else {
-        // 취소하면 전부 삭제
+        // 痍⑥냼?섎㈃ ?꾨? ??젣
         params.append('usedImages', '');
         params.append('mode', 'cancel');
     }
@@ -800,7 +798,7 @@ function sendCleanup({ keepUsed }) {
         navigator.sendBeacon('/api/uploads/cleanup', params);
         cleanupSent = true;
     } catch (e) {
-        // Beacon이 안 될 수도 있으니까 fetch fallback
+        // Beacon???????섎룄 ?덉쑝?덇퉴 fetch fallback
         fetch('/api/uploads/cleanup', {
             method: 'POST',
             body: params,
@@ -810,7 +808,7 @@ function sendCleanup({ keepUsed }) {
     }
 }
 
-// 취소 버튼 눌렀을 때: 임시 업로드 전부 버리고 /posts 로 나감
+// 痍⑥냼 踰꾪듉 ?뚮????? ?꾩떆 ?낅줈???꾨? 踰꾨━怨?/posts 濡??섍컧
 if (cancelBtn) {
     cancelBtn.addEventListener('click', (e) => {
         if (uploadedImages.size > 0) {
@@ -828,29 +826,29 @@ if (cancelBtn) {
     });
 }
 
-// 페이지 이탈 시: 사용 안 된 임시 이미지는 정리
+// ?섏씠吏 ?댄깉 ?? ?ъ슜 ?????꾩떆 ?대?吏???뺣━
 window.addEventListener('beforeunload', () => {
     if (uploadedImages.size > 0 && !cleanupSent) {
-        // 정상 제출(submit)로 종료되는 경우엔 cleanupSent를 true로 만들거라서 여기 안 탐
+        // ?뺤긽 ?쒖텧(submit)濡?醫낅즺?섎뒗 寃쎌슦??cleanupSent瑜?true濡?留뚮뱾嫄곕씪???ш린 ????
         sendCleanup({ keepUsed: !isCancelling });
     }
 });
 
-// === 폼 제출 직전 최종 동기화 ===
-// 이게 중요함: preview 내용을 textarea로 복사하고
-// cleanupSent=true로 바꿔서 서버가 임시파일을 지우지 않게 보호
+// === ???쒖텧 吏곸쟾 理쒖쥌 ?숆린??===
+// ?닿쾶 以묒슂?? preview ?댁슜??textarea濡?蹂듭궗?섍퀬
+// cleanupSent=true濡?諛붽퓭???쒕쾭媛 ?꾩떆?뚯씪??吏?곗? ?딄쾶 蹂댄샇
 if (postForm) {
     postForm.addEventListener('submit', () => {
-        // 본문 최종 HTML -> textarea로
+        // 蹂몃Ц 理쒖쥌 HTML -> textarea濡?
         textarea.value = preview.innerHTML;
 
-        // "나는 정상 저장 중이다" 표시
+        // "?섎뒗 ?뺤긽 ???以묒씠?? ?쒖떆
         isCancelling = false;
         cleanupSent = true;
     });
 }
 
-// === 리사이징 로직 (이미지/비디오/지도 박스 드래그로 크기 조절) ===
+// === 由ъ궗?댁쭠 濡쒖쭅 (?대?吏/鍮꾨뵒??吏??諛뺤뒪 ?쒕옒洹몃줈 ?ш린 議곗젅) ===
 let isResizing = false;
 let currentElement = null;
 let startX, startY, startWidth, startHeight;
@@ -874,7 +872,7 @@ function showResizeIndicator(element, width, height, mouseX, mouseY) {
         document.body.appendChild(resizeIndicator);
     }
 
-    resizeIndicator.textContent = `${Math.round(width)}px × ${Math.round(height)}px`;
+    resizeIndicator.textContent = `${Math.round(width)}px 횞 ${Math.round(height)}px`;
     resizeIndicator.style.left = mouseX + 'px';
     resizeIndicator.style.top = mouseY + 'px';
     resizeIndicator.style.display = 'block';
@@ -889,7 +887,7 @@ function hideResizeIndicator() {
 preview.addEventListener('mousedown', (e) => {
     const target = e.target;
 
-    // 이미지 크기 조절
+    // ?대?吏 ?ш린 議곗젅
     if (target.tagName === 'IMG' && target.classList.contains('resizable-media')) {
         isResizing = true;
         currentElement = target;
@@ -899,7 +897,7 @@ preview.addEventListener('mousedown', (e) => {
         e.preventDefault();
     }
 
-    // 비디오 컨테이너(iframe wrapper나 video wrapper)
+    // 鍮꾨뵒??而⑦뀒?대꼫(iframe wrapper??video wrapper)
     if (target.closest('.resizable-video')) {
         const videoContainer = target.closest('.resizable-video');
         isResizing = true;
@@ -910,7 +908,7 @@ preview.addEventListener('mousedown', (e) => {
         e.preventDefault();
     }
 
-    // 지도 컨테이너
+    // 吏??而⑦뀒?대꼫
     if (target.classList.contains('resizable-map') || target.closest('.resizable-map')) {
         const mapContainer = target.classList.contains('resizable-map')
             ? target
@@ -932,21 +930,21 @@ document.addEventListener('mousemove', (e) => {
     const deltaX = e.clientX - startX;
 
     if (currentElement.tagName === 'IMG') {
-        // 이미지
+        // ?대?吏
         const newWidth = Math.max(100, Math.min(startWidth + deltaX, preview.offsetWidth));
         currentElement.style.width = newWidth + 'px';
         currentElement.style.maxWidth = 'none';
 
         showResizeIndicator(currentElement, newWidth, currentElement.offsetHeight, e.clientX, e.clientY);
     } else if (currentElement.classList.contains('resizable-video')) {
-        // 비디오 (16:9 가정)
+        // 鍮꾨뵒??(16:9 媛??
         const newWidth = Math.max(200, Math.min(startWidth + deltaX, preview.offsetWidth));
         const newHeight = newWidth * 9 / 16;
         currentElement.style.width = newWidth + 'px';
 
         showResizeIndicator(currentElement, newWidth, newHeight, e.clientX, e.clientY);
     } else if (currentElement.classList.contains('resizable-map')) {
-        // 지도 박스 (width/height 둘 다)
+        // 吏??諛뺤뒪 (width/height ????
         const deltaY = e.clientY - startY;
         const newWidth = Math.max(200, Math.min(startWidth + deltaX, preview.offsetWidth));
         const newHeight = Math.max(200, startHeight + deltaY);
@@ -957,7 +955,7 @@ document.addEventListener('mousemove', (e) => {
         showResizeIndicator(currentElement, newWidth, newHeight, e.clientX, e.clientY);
     }
 
-    // 리사이징 중에도 textarea 최신화
+    // 由ъ궗?댁쭠 以묒뿉??textarea 理쒖떊??
     textarea.value = preview.innerHTML;
     e.preventDefault();
 });
@@ -969,3 +967,7 @@ document.addEventListener('mouseup', () => {
         hideResizeIndicator();
     }
 });
+
+
+
+

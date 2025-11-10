@@ -10,6 +10,11 @@ import java.time.LocalDate;
 /**
  * 방문자 수 카운트 엔티티
  */
+/**
+ * 방문자 카운트 엔티티.
+ *
+ * 일자별 방문자 집계(count)를 보관합니다.
+ */
 @Entity
 @Table(name = "visitor_counts")
 @Getter

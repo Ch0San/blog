@@ -12,6 +12,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * 스프링 시큐리티 UserDetailsService 구현체.
+ *
+ * 회원 사용자명을 통해 사용자 정보를 로드하고, ROLE_접두사의 권한을 부여합니다.
+ */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -21,6 +26,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.memberRepository = memberRepository;
     }
 
+    /**
+     * 사용자명을 통해 사용자 정보를 로딩합니다.
+     *
+     * @param username 사용자명
+     * @return 스프링 시큐리티 UserDetails
+     * @throws UsernameNotFoundException 사용자를 찾지 못한 경우
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Member member = memberRepository.findByUsername(username);

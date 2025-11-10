@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * CommentLike JPA Repository
+ * CommentLike 리포지토리.
  */
 public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> {
     Optional<CommentLike> findByCommentIdAndUsername(Long commentId, String username);

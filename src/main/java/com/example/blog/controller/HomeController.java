@@ -20,6 +20,12 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Duration;
 
+/**
+ * 홈(메인) 페이지 컨트롤러.
+ *
+ * 방문자 수 쿠키 기반 집계, 인기/최신 게시글, 최근 공지, 사이트 설정 값과
+ * 로그인 사용자 정보 등을 모델에 담아 인덱스 페이지를 렌더링합니다.
+ */
 @Controller
 public class HomeController {
 
@@ -38,6 +44,16 @@ public class HomeController {
         this.noticeService = noticeService;
     }
 
+    /**
+     * 인덱스 페이지를 렌더링합니다. 금일 최초 방문 시 방문자 카운트를 증가시키고
+     * 자정까지 유효한 쿠키를 설정합니다.
+     *
+     * @param userDetails 인증 사용자(선택)
+     * @param model       뷰 렌더링용 모델
+     * @param request     HTTP 요청(쿠키 확인용)
+     * @param response    HTTP 응답(쿠키 설정용)
+     * @return 뷰 이름(`index`)
+     */
     @GetMapping("/")
     public String home(@AuthenticationPrincipal UserDetails userDetails, Model model,
             HttpServletRequest request, HttpServletResponse response) {
@@ -115,6 +131,12 @@ public class HomeController {
     }
 
     // HTML 태그 제거 유틸리티 메서드
+    /**
+     * HTML 태그 제거 유틸리티.
+     *
+     * @param html HTML 문자열
+     * @return 태그 제거된 텍스트
+     */
     private String stripHtmlTags(String html) {
         if (html == null) {
             return "";

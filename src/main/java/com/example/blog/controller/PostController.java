@@ -32,7 +32,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 게시글 목록 컨트롤러
+ * 게시글(Post) 컨트롤러.
+ *
+ * 목록/검색/상세 보기와 게시글 작성·수정·삭제, 첨부파일(이미지/파일) 업로드/정리를 담당합니다.
+ * 또한 좋아요 상태 및 댓글 목록 정보를 함께 제공하며, 상세 조회 시 조회수를 증가시킵니다.
  */
 @Controller
 public class PostController {
@@ -54,6 +57,12 @@ public class PostController {
     /**
      * 본문 HTML에서 실제 사용된 /uploads/images 경로 추출
      */
+    /**
+     * 게시글 본문 HTML에서 사용된 이미지(`/uploads/images/...`) URL을 추출합니다.
+     *
+     * @param content HTML 본문
+     * @return 본문에서 사용된 이미지 URL 집합
+     */
     private Set<String> extractUsedImageUrls(String content) {
         Set<String> urls = new HashSet<>();
         if (content == null || content.isEmpty()) {
@@ -72,6 +81,12 @@ public class PostController {
 
     /**
      * 임시 업로드 이미지 정리: 실제 사용되지 않은 이미지 삭제
+     */
+    /**
+     * 임시 업로드한 이미지 정리: 본문에서 사용되지 않은 임시 이미지 파일을 삭제합니다.
+     *
+     * @param session 업로드 경로를 보관한 세션
+     * @param content 현재 본문 HTML
      */
     private void cleanupTempUploads(HttpSession session, String content) {
         @SuppressWarnings("unchecked")
@@ -103,6 +118,12 @@ public class PostController {
     }
 
     // HTML 태그 제거 유틸리티 메서드
+    /**
+     * HTML 태그를 제거하여 순수 텍스트로 변환합니다.
+     *
+     * @param html HTML 문자열
+     * @return 태그 제거 후 텍스트
+     */
     private String stripHtmlTags(String html) {
         if (html == null || html.isEmpty()) {
             return "";
@@ -111,6 +132,14 @@ public class PostController {
     }
 
     // /posts?page=0 기반 (0부터 시작). 뷰에서는 1-based로 표시할 수 있음
+    /**
+     * 게시글 목록 페이지를 조회합니다.
+     *
+     * @param page      0부터 시작하는 페이지 번호
+     * @param category  선택적 카테고리명
+     * @param model     뷰 렌더링용 모델
+     * @return 목록 뷰 이름(`posts/list`)
+     */
     @GetMapping("/posts")
     public String list(
             @RequestParam(defaultValue = "0") int page,
@@ -140,6 +169,15 @@ public class PostController {
     }
 
     // 게시글 검색
+    /**
+     * 게시글을 검색합니다.
+     *
+     * @param field 검색 필드(`title`,`content`,`tags`)
+     * @param q     검색어(없으면 빈 문자열)
+     * @param page  0부터 시작하는 페이지 번호
+     * @param model 뷰 렌더링용 모델
+     * @return 목록 뷰 이름(`posts/list`)
+     */
     @GetMapping("/posts/search")
     public String search(
             @RequestParam String field,
@@ -173,6 +211,14 @@ public class PostController {
     }
 
     // 게시글 상세보기
+    /**
+     * 게시글 상세 페이지를 조회합니다. 조회수는 1 증가합니다.
+     *
+     * @param id    게시글 식별자
+     * @param model 뷰 렌더링용 모델
+     * @param authentication 인증 정보(있으면 좋아요/댓글 좋아요 상태 포함)
+     * @return 상세 뷰 이름(`posts/detail`), 존재하지 않으면 목록으로 리다이렉트
+     */
     @GetMapping("/posts/{id}")
     public String detail(@PathVariable Long id, Model model, Authentication authentication) {
         Post post = postService.getPostByIdAndIncrementViewCount(id);
@@ -218,12 +264,35 @@ public class PostController {
     }
 
     // 글쓰기 페이지
+    /**
+     * 게시글 작성 폼을 표시합니다.
+     *
+     * @return 작성 폼 뷰 이름(`posts/write`)
+     */
     @GetMapping("/posts/write")
     public String writeForm() {
         return "posts/write";
     }
 
     // 글 저장
+    /**
+     * 새 게시글을 생성합니다. 썸네일/이미지/파일 업로드를 처리합니다.
+     *
+     * @param title           제목
+     * @param author          작성자 표시명
+     * @param content         본문 HTML
+     * @param category        선택적 카테고리
+     * @param tags            선택적 태그
+     * @param thumbnailFile   선택적 업로드 썸네일 파일
+     * @param thumbnailUrlParam 선택적 기존 썸네일 URL(hidden)
+     * @param videoUrl        선택적 동영상 URL
+     * @param imageFiles      선택적 이미지 파일 목록
+     * @param files           선택적 일반 파일 목록
+     * @param imageUrls       선택적 본문 내 이미지 URL 목록(콤마 구분)
+     * @param isPublic        공개 여부
+     * @param session         임시 업로드 경로 보관 세션
+     * @return 생성 후 목록으로 리다이렉트. 업로드 오류 시 폼으로 리다이렉트
+     */
     @PostMapping(value = "/posts/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String write(
             @RequestParam String title,
@@ -339,6 +408,13 @@ public class PostController {
     }
 
     // 글 수정 페이지
+    /**
+     * 게시글 수정 폼을 표시합니다.
+     *
+     * @param id    게시글 식별자
+     * @param model 뷰 렌더링용 모델
+     * @return 수정 폼 뷰 이름(`posts/edit`), 존재하지 않으면 목록으로 리다이렉트
+     */
     @GetMapping("/posts/edit/{id}")
     public String editForm(@PathVariable Long id, Model model) {
         Post post = postService.getPostById(id);
@@ -350,6 +426,27 @@ public class PostController {
     }
 
     // 글 수정 처리
+    /**
+     * 게시글을 수정합니다. 썸네일 교체/삭제, 이미지·파일 추가/삭제를 처리합니다.
+     *
+     * @param id               게시글 식별자
+     * @param title            제목
+     * @param author           작성자 표시명
+     * @param content          본문 HTML
+     * @param category         카테고리
+     * @param tags             태그
+     * @param thumbnailFile    선택적 교체용 썸네일 파일
+     * @param thumbnailUrlParam 선택적 교체용 썸네일 URL
+     * @param deleteThumbnail  썸네일 삭제 여부
+     * @param deleteImageIds   삭제할 이미지 ID 목록
+     * @param deleteFileUrls   삭제할 파일 URL 목록
+     * @param files            추가할 파일 목록
+     * @param imageFiles       추가할 이미지 목록
+     * @param imageUrls        본문 내 이미지 URL 목록
+     * @param isPublic         공개 여부
+     * @param session          임시 업로드 경로 보관 세션
+     * @return 수정 후 상세로 리다이렉트. 오류 시 폼으로 리다이렉트
+     */
     @PostMapping("/posts/edit/{id}")
     public String edit(
             @PathVariable Long id,
@@ -510,6 +607,12 @@ public class PostController {
     }
 
     // 글 삭제
+    /**
+     * 게시글을 삭제합니다. 관련 로컬 첨부파일도 함께 정리합니다.
+     *
+     * @param id 게시글 식별자
+     * @return 목록으로 리다이렉트
+     */
     @PostMapping("/posts/delete/{id}")
     public String delete(@PathVariable Long id) {
         postService.deletePost(id);

@@ -12,6 +12,11 @@ import java.time.LocalDateTime;
  * 게시글 좋아요 엔티티
  * 사용자와 게시글 간의 좋아요 관계를 저장
  */
+/**
+ * 게시글 좋아요 엔티티.
+ *
+ * 사용자-게시글 간 좋아요 관계를 저장합니다(복합 유니크 제약).
+ */
 @Entity
 @Table(name = "post_likes", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "post_id", "username" })

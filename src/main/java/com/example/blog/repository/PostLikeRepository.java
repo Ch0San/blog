@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 /**
- * PostLike JPA Repository
+ * PostLike 리포지토리.
  */
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
     // 특정 게시글에 대한 사용자의 좋아요 조회

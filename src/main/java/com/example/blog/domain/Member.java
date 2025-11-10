@@ -13,6 +13,11 @@ import java.time.LocalDateTime;
  * 회원 정보 엔티티
  * 블로그 사용자의 기본 정보를 저장하는 테이블
  */
+/**
+ * 회원 엔티티.
+ *
+ * 블로그 사용자의 기본 정보, 상태, 권한을 보관합니다.
+ */
 @Entity
 @Table(name = "members")
 @Getter

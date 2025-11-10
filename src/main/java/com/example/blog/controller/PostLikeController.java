@@ -14,6 +14,11 @@ import java.util.Map;
 /**
  * 게시글 좋아요 컨트롤러
  */
+/**
+ * 게시글 좋아요 컨트롤러.
+ *
+ * AJAX 요청으로 좋아요 토글과 현재 좋아요 수를 반환합니다.
+ */
 @Controller
 public class PostLikeController {
     private final PostLikeService postLikeService;
@@ -23,6 +28,13 @@ public class PostLikeController {
     }
 
     // 좋아요 토글 (인증 필요) - AJAX 요청 처리
+    /**
+     * 게시글 좋아요를 토글합니다(인증 필요).
+     *
+     * @param postId         게시글 식별자
+     * @param authentication 인증 정보(사용자 식별)
+     * @return `isLiked`, `likeCount`를 포함한 JSON 응답
+     */
     @PostMapping("/posts/{postId}/like")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> toggleLike(

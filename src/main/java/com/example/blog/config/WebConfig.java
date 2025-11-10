@@ -11,6 +11,11 @@ import java.nio.file.Paths;
 /**
  * 정적 리소스(업로드 파일) 매핑 설정
  */
+/**
+ * 정적 리소스(업로드 파일) 매핑 설정.
+ *
+ * `uploads` 디렉터리를 `/uploads/**` 경로로 노출합니다.
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Override

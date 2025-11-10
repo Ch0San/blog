@@ -1,4 +1,4 @@
-// DOM이 준비된 후 이벤트 바인딩 (초기 렌더 타이밍 이슈 방지)
+﻿// DOM이 준비된 후 이벤트 바인딩 (초기 렌더 타이밍 이슈 방지)
 document.addEventListener('DOMContentLoaded', () => {
     // 게시글 좋아요 처리
     const likeBtn = document.getElementById('likeBtn');
@@ -136,3 +136,4 @@ function shareToFacebook() {
     const url = encodeURIComponent(window.location.href);
     window.open('https://www.facebook.com/sharer/sharer.php?u=' + url, '_blank', 'noopener');
 }
+

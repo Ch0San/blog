@@ -8,6 +8,9 @@ import java.util.List;
 /**
  * Comment JPA Repository
  */
+/**
+ * Comment 리포지토리.
+ */
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     // 게시글별 댓글 조회 (삭제되지 않은 것만)
     List<Comment> findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(Long postId);

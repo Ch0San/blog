@@ -10,6 +10,11 @@ import java.time.LocalDate;
 /**
  * 방문자 수 카운트 서비스
  */
+/**
+ * 방문자 카운트 서비스.
+ *
+ * 일(day) 단위 방문자 수를 저장/증가/조회합니다.
+ */
 @Service
 public class VisitorCountService {
 
@@ -21,6 +26,9 @@ public class VisitorCountService {
 
     /**
      * 오늘 방문자 수 증가
+     */
+    /**
+     * 금일 방문자 수를 1 증가시킵니다.
      */
     @Transactional
     public void incrementTodayVisitor() {
@@ -40,6 +48,11 @@ public class VisitorCountService {
     /**
      * 오늘 방문자 수 조회
      */
+    /**
+     * 금일 방문자 수를 조회합니다.
+     *
+     * @return 금일 방문자 수(없으면 0)
+     */
     public Long getTodayVisitorCount() {
         LocalDate today = LocalDate.now();
         return visitorCountRepository.findByVisitDate(today)
@@ -49,6 +62,11 @@ public class VisitorCountService {
 
     /**
      * 전체 방문자 수 조회
+     */
+    /**
+     * 전체 방문자 수를 조회합니다.
+     *
+     * @return 누적 방문자 수(없으면 0)
      */
     public Long getTotalVisitorCount() {
         Long total = visitorCountRepository.getTotalVisitorCount();

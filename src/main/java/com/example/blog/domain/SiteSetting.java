@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 /**
  * 사이트 설정 엔티티
  */
+/**
+ * 사이트 설정 엔티티.
+ *
+ * 키-값 설정과 설명을 저장합니다.
+ */
 @Entity
 @Table(name = "site_settings")
 public class SiteSetting {

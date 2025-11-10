@@ -12,6 +12,11 @@ import java.time.LocalDateTime;
 /**
  * 공지사항 엔티티 (댓글/좋아요/미디어 없음)
  */
+/**
+ * 공지사항 엔티티.
+ *
+ * 제목/본문/작성자/조회수와 생성/수정 시각을 보관합니다.
+ */
 @Entity
 @Table(name = "notices")
 @Getter

@@ -12,6 +12,17 @@
         rel="stylesheet" />
     <link rel="stylesheet" th:href="@{/css/style.css}" />
 
+    <style>
+      /* Image float helpers for editor preview */
+      #livePreview .image-float-left { float: left; margin: 0 16px 8px 0; max-width: 48%; }
+      #livePreview .image-float-right { float: right; margin: 0 0 8px 16px; max-width: 48%; }
+      #livePreview .image-centered { float: none; display: block; margin: 16px auto; }
+      /* Ensure images scale within wrappers */
+      #livePreview .image-float-left img,
+      #livePreview .image-float-right img,
+      #livePreview .image-centered img { max-width: 100%; height: auto; }
+    </style>
+
     <!-- CSRF for AJAX -->
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">

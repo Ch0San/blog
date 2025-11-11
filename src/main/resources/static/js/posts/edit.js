@@ -398,6 +398,107 @@ if (tbAlignLeft) tbAlignLeft.addEventListener('click', () => applyAlignment('lef
 if (tbAlignCenter) tbAlignCenter.addEventListener('click', () => applyAlignment('center'));
 if (tbAlignRight) tbAlignRight.addEventListener('click', () => applyAlignment('right'));
 
+// 이미지 정렬 지원: applyAlignment 오버라이드
+// 기존 동작(문자 정렬)은 유지하고, 선택/커서 근처 IMG가 있으면 해당 이미지를 감싸 정렬합니다.
+applyAlignment = (function (orig) {
+  return function (align) {
+    preview.focus();
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return orig(align);
+    const range = sel.getRangeAt(0);
+
+    const findSelectedImage = () => {
+      const node = sel.focusNode;
+      let el = node && node.nodeType === 1 ? node : node && node.parentElement;
+      while (el && el !== preview) {
+        if (el.tagName === 'IMG') return el;
+        el = el.parentElement;
+      }
+      try {
+        const frag = range.cloneContents();
+        if (frag && frag.querySelector) {
+          const imgInRange = frag.querySelector('img');
+          if (imgInRange) {
+            const src = imgInRange.getAttribute('src');
+            if (src) {
+              const esc = window.CSS && CSS.escape ? CSS.escape(src) : src.replace(/([.*+?^${}()|\[\]\\])/g, '\\$1');
+              const domImg = preview.querySelector(`img[src="${esc}"]`);
+              if (domImg) return domImg;
+            }
+          }
+        }
+      } catch (_) { }
+      if (node && node.nodeType === 3 && node.previousSibling && node.previousSibling.tagName === 'IMG') return node.previousSibling;
+      if (el && el.previousElementSibling && el.previousElementSibling.tagName === 'IMG') return el.previousElementSibling;
+      return null;
+    };
+
+    const img = findSelectedImage();
+    if (img) {
+      try {
+        let wrapper = img.parentElement;
+        const isWrapper = wrapper && wrapper.nodeName === 'DIV' && (wrapper.dataset && wrapper.dataset.imgAlign === 'true');
+        if (!isWrapper) {
+          const w = document.createElement('div');
+          w.dataset.imgAlign = 'true';
+          img.parentNode.insertBefore(w, img);
+          w.appendChild(img);
+          wrapper = w;
+        } else {
+          if (!wrapper.dataset) wrapper.setAttribute('data-img-align', 'true');
+        }
+        // Float-based alignment so text can wrap next to image
+        wrapper.style.maxWidth = '';
+        if (align === 'left') {
+          wrapper.classList.remove('image-float-right', 'image-centered');
+          wrapper.classList.add('image-float-left');
+          wrapper.style.float = 'left';
+          wrapper.style.margin = '0 16px 8px 0';
+          wrapper.style.textAlign = '';
+          wrapper.style.maxWidth = '48%';
+          img.style.display = 'block';
+          img.style.margin = '0';
+        } else if (align === 'right') {
+          wrapper.classList.remove('image-float-left', 'image-centered');
+          wrapper.classList.add('image-float-right');
+          wrapper.style.float = 'right';
+          wrapper.style.margin = '0 0 8px 16px';
+          wrapper.style.textAlign = '';
+          wrapper.style.maxWidth = '48%';
+          img.style.display = 'block';
+          img.style.margin = '0';
+        } else { // center
+          wrapper.classList.remove('image-float-left', 'image-float-right');
+          wrapper.classList.add('image-centered');
+          wrapper.style.float = 'none';
+          wrapper.style.margin = '16px auto';
+          wrapper.style.textAlign = 'center';
+          wrapper.style.maxWidth = '';
+          img.style.display = 'inline-block';
+          img.style.margin = '0 auto';
+        }
+        // Move caret after wrapper and ensure a typing area exists, so multiple lines wrap beside the float
+        const parent = wrapper.parentNode;
+        if (!wrapper.nextSibling) {
+          const spacer = document.createElement('div');
+          spacer.innerHTML = '<br>';
+          parent.insertBefore(spacer, wrapper.nextSibling);
+        }
+        const caretRange = document.createRange();
+        caretRange.setStartAfter(wrapper);
+        caretRange.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(caretRange);
+        textarea.value = preview.innerHTML;
+        return;
+      } catch (ex) { console.error('image alignment error:', ex); }
+    }
+
+    // fallback to original behavior
+    orig(align);
+  };
+})(applyAlignment);
+
 // 이미지/동영상 삽입 버튼
 if (tbImage) tbImage.addEventListener('click', () => { const inlineInput = document.getElementById('inlineImageUpload'); inlineInput && inlineInput.click(); });
 if (tbVideo) {

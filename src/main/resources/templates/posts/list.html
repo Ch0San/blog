@@ -84,9 +84,18 @@
 
                 <!-- 본문 요약 -->
                 <div class="excerpt" style="color:#4b5563;font-size:14px;line-height:1.5;word-break:break-word;">
-                    <span th:text="${#strings.length(post.content) > 150
-                                    ? #strings.substring(post.content, 0, 150) + '...'
-                                    : post.content}">
+                    <span th:with="
+                            s1=${#strings.replace(post.content,'&nbsp;',' ')},
+                            s2=${#strings.replace(s1,'&#160;',' ')},
+                            s3=${#strings.replace(s2,'&#xA0;',' ')},
+                            s4=${#strings.replace(s3,' ',' ')},
+                            s5=${#strings.replace(s4,'&amp;nbsp;',' ')},
+                            s6=${#strings.replace(s5,'  ',' ')},
+                            s7=${#strings.replace(s6,'  ',' ')},
+                            clean=${#strings.trim(s7)}"
+                          th:text="${#strings.length(clean) > 150
+                                    ? #strings.substring(clean, 0, 150) + '...'
+                                    : clean}">
                         내용 미리보기
                     </span>
                 </div>

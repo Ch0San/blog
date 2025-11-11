@@ -21,7 +21,7 @@
   try {
     var masked = key.slice(0, 4) + '***' + key.slice(-4);
     console.log('[Kakao SDK] injecting sdk.js with key=', masked);
-  } catch (e) {}
+  } catch (e) { }
 })();
 
 // 주요 엘리먼트 캐싱
@@ -42,6 +42,7 @@ const tbAlignCenter = document.getElementById('tb-align-center');
 const tbAlignRight = document.getElementById('tb-align-right');
 const tbFontFamily = document.getElementById('tb-fontFamily');
 const tbFontSize = document.getElementById('tb-fontSize');
+const tbDivider = document.getElementById('tb-divider');
 
 const preview = document.getElementById('livePreview');
 const textarea = document.getElementById('content');
@@ -102,7 +103,7 @@ preview.addEventListener('mouseover', (e) => {
           if (thumbnailFileInput) thumbnailFileInput.value = '';
           const deleteThumbnailCheckbox = document.getElementById('deleteThumbnail');
           if (deleteThumbnailCheckbox) deleteThumbnailCheckbox.checked = false;
-        } catch (_) {}
+        } catch (_) { }
         try {
           const previewBox = document.getElementById('thumbnailPreview');
           if (previewBox) {
@@ -343,6 +344,11 @@ if (tbBold) tbBold.addEventListener('click', () => { preview.focus(); document.e
 if (tbItalic) tbItalic.addEventListener('click', () => { preview.focus(); document.execCommand('italic', false, null); textarea.value = preview.innerHTML; tbItalic.classList.toggle('active'); });
 if (tbUnderline) tbUnderline.addEventListener('click', () => { preview.focus(); document.execCommand('underline', false, null); textarea.value = preview.innerHTML; tbUnderline.classList.toggle('active'); });
 
+// 구분선 삽입
+if (tbDivider) tbDivider.addEventListener('click', () => {
+  insertHtmlAtCursor('<hr class="post-divider" style="border:none;border-top:1px solid #e6e8eb;margin:16px 0">');
+});
+
 // 색상/폰트 설정
 if (tbColor) {
   tbColor.addEventListener('change', (e) => {
@@ -533,7 +539,7 @@ function sendCleanup({ keepUsed }) {
     params.append('usedImages', usedImages.join(','));
   } else { params.append('usedImages', ''); params.append('mode', 'cancel'); }
   try { navigator.sendBeacon('/api/uploads/cleanup', params); cleanupSent = true; }
-  catch (e) { fetch('/api/uploads/cleanup', { method: 'POST', body: params, keepalive: true }).catch(() => {}); cleanupSent = true; }
+  catch (e) { fetch('/api/uploads/cleanup', { method: 'POST', body: params, keepalive: true }).catch(() => { }); cleanupSent = true; }
 }
 
 document.getElementById('inlineImageUpload')?.addEventListener('change', async (e) => {
@@ -627,4 +633,3 @@ document.addEventListener('mousemove', (e) => {
 });
 
 document.addEventListener('mouseup', () => { if (isResizing) { isResizing = false; currentElement = null; hideResizeIndicator(); } });
-

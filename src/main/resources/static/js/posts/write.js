@@ -23,7 +23,7 @@
   try {
     var masked = key.slice(0, 4) + '***' + key.slice(-4);
     console.log('[Kakao SDK] injecting sdk.js with key=', masked);
-  } catch (_) {}
+  } catch (_) { }
 })();
 
 // 주요 엘리먼트 캐싱
@@ -45,6 +45,7 @@ const tbAlignCenter = document.getElementById('tb-align-center');
 const tbAlignRight = document.getElementById('tb-align-right');
 const tbFontFamily = document.getElementById('tb-fontFamily');
 const tbFontSize = document.getElementById('tb-fontSize');
+const tbDivider = document.getElementById('tb-divider');
 
 const preview = document.getElementById('livePreview');
 const textarea = document.getElementById('content');
@@ -102,7 +103,7 @@ preview.addEventListener('mouseover', (e) => {
       const thumbnailInput = document.getElementById('thumbnailUrl');
       if (thumbnailInput) {
         thumbnailInput.value = img.src;
-        try { if (thumbnailFileInput) thumbnailFileInput.value = ''; } catch (_) {}
+        try { if (thumbnailFileInput) thumbnailFileInput.value = ''; } catch (_) { }
         try {
           if (thumbnailPreview) {
             thumbnailPreview.innerHTML = '';
@@ -162,7 +163,7 @@ if (thumbnailFileInput) {
         const img = document.createElement('img'); img.className = 'thumbnail-preview-image'; img.src = URL.createObjectURL(file); img.alt = '선택한 썸네일';
         wrapper.appendChild(label); wrapper.appendChild(img); thumbnailPreview.appendChild(wrapper);
       }
-    } catch (_) {}
+    } catch (_) { }
   });
 }
 
@@ -240,6 +241,11 @@ if (tbBold) tbBold.addEventListener('click', () => { preview.focus(); document.e
 if (tbItalic) tbItalic.addEventListener('click', () => { preview.focus(); document.execCommand('italic', false, null); textarea.value = preview.innerHTML; tbItalic.classList.toggle('active'); });
 if (tbUnderline) tbUnderline.addEventListener('click', () => { preview.focus(); document.execCommand('underline', false, null); textarea.value = preview.innerHTML; tbUnderline.classList.toggle('active'); });
 
+// 구분선 삽입
+if (tbDivider) tbDivider.addEventListener('click', () => {
+  insertHtmlAtCursor('<hr class="post-divider" style="border:none;border-top:1px solid #e6e8eb;margin:16px 0">');
+});
+
 // 색상/폰트
 if (tbColor) tbColor.addEventListener('change', (e) => { preview.focus(); const val = e.target.value; if (val) { const noSel = wrapSelectionWithTag('span', { color: val }); if (noSel) { currentColor = val; tbColor.style.backgroundColor = '#e3f2fd'; } } else { currentColor = ''; tbColor.style.backgroundColor = '#fff'; } });
 if (tbFontFamily) tbFontFamily.addEventListener('change', (e) => { preview.focus(); if (e.target.value) { currentFontFamily = e.target.value; const noSel = wrapSelectionWithTag('span', { fontFamily: e.target.value }); if (noSel) tbFontFamily.style.backgroundColor = '#e3f2fd'; } else { currentFontFamily = ''; tbFontFamily.style.backgroundColor = '#fff'; } });
@@ -274,7 +280,8 @@ if (tbVideo) {
   <div style="padding-bottom:56.25%;position:relative">
     <iframe src="https://www.youtube.com/embed/${videoId}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:8px" allowfullscreen></iframe>
   </div>
-</div>`; }
+</div>`;
+      }
     } else {
       videoHtml = `
 <div class="resizable-media resizable-video" style="width:640px;max-width:100%;margin:16px auto;cursor:nwse-resize;display:block">
@@ -282,7 +289,8 @@ if (tbVideo) {
     <source src="${url}" type="video/mp4">
     브라우저가 동영상을 재생하지 못했습니다.
   </video>
-</div>`; }
+</div>`;
+    }
     if (videoHtml) insertHtmlAtCursor(videoHtml); else insertHtmlAtCursor(`<p>동영상 링크: <a href="${url}" target="_blank">${url}</a></p>`);
   });
 }
@@ -370,7 +378,7 @@ function sendCleanup({ keepUsed }) {
     params.append('usedImages', usedImages.join(','));
   } else { params.append('usedImages', ''); params.append('mode', 'cancel'); }
   try { navigator.sendBeacon('/api/uploads/cleanup', params); cleanupSent = true; }
-  catch (e) { fetch('/api/uploads/cleanup', { method: 'POST', body: params, keepalive: true }).catch(() => {}); cleanupSent = true; }
+  catch (e) { fetch('/api/uploads/cleanup', { method: 'POST', body: params, keepalive: true }).catch(() => { }); cleanupSent = true; }
 }
 
 // 취소 버튼: 임시 업로드 정리 후 /posts로 이동
@@ -417,4 +425,3 @@ document.addEventListener('mousemove', (e) => {
 });
 
 document.addEventListener('mouseup', () => { if (isResizing) { isResizing = false; currentElement = null; hideResizeIndicator(); } });
-

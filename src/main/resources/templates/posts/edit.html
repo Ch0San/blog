@@ -25,12 +25,12 @@
         <div class="write-layout"
             style="display:flex;flex-direction:row;align-items:stretch;gap:0;position:relative;min-height:600px;">
             <form th:action="@{'/posts/edit/' + ${post.id}}" method="post" enctype="multipart/form-data"
-                  class="editor-form"
-                  style="display:flex;flex-direction:row;flex:1;gap:0;position:relative;min-height:600px;">
+                class="editor-form"
+                style="display:flex;flex-direction:row;flex:1;gap:0;position:relative;min-height:600px;">
 
                 <!-- 왼쪽: 글 작성 영역 -->
                 <div class="write-form"
-                     style="min-width:0;max-width:680px;flex-basis:680px;padding-right:32px;flex:1 1 0;z-index:1;background:#fff;">
+                    style="min-width:0;max-width:680px;flex-basis:680px;padding-right:32px;flex:1 1 0;z-index:1;background:#fff;">
                     <h1 style="margin-top:0;margin-bottom:0;color:var(--text)">글 수정</h1><br>
                     <input type="hidden" id="csrfField" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     <!-- 에디터에서 비동기 업로드로 삽입된 이미지 URL 목록(콤마 구분) -->
@@ -104,136 +104,142 @@
 
                 <!-- 오른쪽: 사이드바 -->
                 <aside class="editor-sidebar"
-                style="position:sticky;top:100px;right:0;align-self:flex-start;min-height:600px;display:flex;flex-direction:column;justify-content:flex-start;background:#fafbfc;border:1px solid #e6e8eb;border-radius:10px;padding:15px;min-width:280px;max-width:280px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-left:40px;margin-right:32px;z-index:2;">
-                <div class="editor-toolbar"
-                    style="display:flex;gap:8px;flex-wrap:wrap;padding:8px;border:1px solid #e6e8eb;border-radius:6px;background:#fafbfc">
-                    <select id="tb-fontFamily" class="editor-select"
-                        style="padding:2px 4px;border:1px solid #dcdde1;border-radius:4px;background:#fff;font-size:11px;min-width:56px">
-                        <option value="">글꼴</option>
-                        <option value="'Noto Sans KR', sans-serif">Noto Sans KR</option>
-                        <option value="Arial, sans-serif">Arial</option>
-                        <option value="'Times New Roman', serif">Times New Roman</option>
-                        <option value="'Courier New', monospace">Courier New</option>
-                        <option value="Georgia, serif">Georgia</option>
-                        <option value="'Malgun Gothic', sans-serif">맑은 고딕</option>
-                    </select>
-                    <select id="tb-fontSize" class="editor-select"
-                        style="padding:2px 4px;border:1px solid #dcdde1;border-radius:4px;background:#fff;font-size:11px;width:48px;min-width:48px">
-                        <option value="">크기</option>
-                        <option value="12px">12px</option>
-                        <option value="14px">14px</option>
-                        <option value="16px">16px</option>
-                        <option value="18px">18px</option>
-                        <option value="20px">20px</option>
-                        <option value="24px">24px</option>
-                        <option value="28px">28px</option>
-                        <option value="32px">32px</option>
-                    </select>
-                    <button type="button" class="btn editor-btn" id="tb-bold" title="볼드"
-                        style="min-width:22px;padding:2px 4px;font-size:11px">B</button>
-                    <button type="button" class="btn editor-btn" id="tb-italic" title="이탤릭"
-                        style="min-width:22px;padding:2px 4px;font-size:11px">I</button>
-                    <button type="button" class="btn editor-btn" id="tb-underline" title="밑줄"
-                        style="min-width:22px;padding:2px 4px;font-size:11px">U</button>
-                    <label for="tb-color" style="display:flex;align-items:center;gap:2px;font-size:11px;color:#666">
-                        색상
-                        <input type="color" id="tb-color" title="글자 색상"
-                            style="width:32px;height:28px;padding:0;border:1px solid #dcdde1;border-radius:4px;background:#fff;cursor:pointer">
-                    </label>
-                    <div class="align-group" style="display:flex;gap:1px;align-items:center">
-                        <button type="button" class="btn editor-btn" id="tb-align-left" title="왼쪽 정렬"
-                            style="min-width:22px;padding:2px 4px;font-size:11px">좌</button>
-                        <button type="button" class="btn editor-btn" id="tb-align-center" title="가운데 정렬"
-                            style="min-width:22px;padding:2px 4px;font-size:11px">중</button>
-                        <button type="button" class="btn editor-btn" id="tb-align-right" title="오른쪽 정렬"
-                            style="min-width:22px;padding:2px 4px;font-size:11px">우</button>
-                    </div>
-                    <span style="flex:1"></span>
-                    <div style="width:100%;display:flex;gap:4px;align-items:center">
-                        <button type="button" class="btn editor-btn" id="tb-image"
-                            style="min-width:24px;padding:2px 6px;font-size:11px">🖼 이미지</button>
-                        <button type="button" class="btn editor-btn" id="tb-video"
-                            style="min-width:24px;padding:2px 6px;font-size:11px">🎬 동영상</button>
-                        <button type="button" class="btn editor-btn" id="tb-map"
-                            style="min-width:24px;padding:2px 6px;font-size:11px">🗺 지도</button>
-                    </div>
-                </div><br>
-                <div class="form-group" style="margin-bottom:24px">
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                        <label style="font-weight:600;margin-bottom:0;">썸네일 미리보기</label>
-                        <label
-                            style="font-size:13px;color:#666;display:flex;align-items:center;gap:2px;margin-bottom:0;white-space:nowrap;">
-                            <input type="checkbox" id="deleteThumbnail" name="deleteThumbnail" value="true"
-                                style="margin-right:2px;transform:scale(0.9)"><span style="display:inline;">삭제</span>
+                    style="position:sticky;top:100px;right:0;align-self:flex-start;min-height:600px;display:flex;flex-direction:column;justify-content:flex-start;background:#fafbfc;border:1px solid #e6e8eb;border-radius:10px;padding:15px;min-width:280px;max-width:280px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-left:40px;margin-right:32px;z-index:2;">
+                    <div class="editor-toolbar"
+                        style="display:flex;gap:8px;flex-wrap:wrap;padding:8px;border:1px solid #e6e8eb;border-radius:6px;background:#fafbfc">
+                        <select id="tb-fontFamily" class="editor-select"
+                            style="padding:2px 4px;border:1px solid #dcdde1;border-radius:4px;background:#fff;font-size:11px;min-width:56px">
+                            <option value="">글꼴</option>
+                            <option value="'Noto Sans KR', sans-serif">Noto Sans KR</option>
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="'Times New Roman', serif">Times New Roman</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                            <option value="Georgia, serif">Georgia</option>
+                            <option value="'Malgun Gothic', sans-serif">맑은 고딕</option>
+                        </select>
+                        <select id="tb-fontSize" class="editor-select"
+                            style="padding:2px 4px;border:1px solid #dcdde1;border-radius:4px;background:#fff;font-size:11px;width:48px;min-width:48px">
+                            <option value="">크기</option>
+                            <option value="12px">12px</option>
+                            <option value="14px">14px</option>
+                            <option value="16px">16px</option>
+                            <option value="18px">18px</option>
+                            <option value="20px">20px</option>
+                            <option value="24px">24px</option>
+                            <option value="28px">28px</option>
+                            <option value="32px">32px</option>
+                        </select>
+                        <button type="button" class="btn editor-btn" id="tb-bold" title="볼드"
+                            style="min-width:22px;padding:2px 4px;font-size:11px">B</button>
+                        <button type="button" class="btn editor-btn" id="tb-italic" title="이탤릭"
+                            style="min-width:22px;padding:2px 4px;font-size:11px">I</button>
+                        <button type="button" class="btn editor-btn" id="tb-underline" title="밑줄"
+                            style="min-width:22px;padding:2px 4px;font-size:11px">U</button>
+                        <label for="tb-color" style="display:flex;align-items:center;gap:2px;font-size:11px;color:#666">
+                            색상
+                            <input type="color" id="tb-color" title="글자 색상"
+                                style="width:32px;height:28px;padding:0;border:1px solid #dcdde1;border-radius:4px;background:#fff;cursor:pointer">
                         </label>
-                    </div>
-                    <input type="file" id="thumbnailFileInput" name="thumbnailFile" accept="image/*" style="margin:10px 0 4px 0;">
-                    <small style="color:var(--muted);display:block;margin-top:4px">본문 이미지에 마우스를 올리고 좌측 상단의 ‘썸네일’ 버튼을 눌러
-                        썸네일을 지정하세요.</small>
-                    <div id="thumbnailPreview" class="thumbnail-preview-container">
-                        <div th:if="${post.thumbnailUrl != null && !#strings.isEmpty(post.thumbnailUrl)}"
-                            id="currentThumbnail" class="current-thumbnail">
-                            <span class="thumbnail-preview-label">현재 썸네일:</span>
-                            <img th:src="${post.thumbnailUrl}" class="thumbnail-preview-image" alt="현재 썸네일">
+                        <div class="align-group" style="display:flex;gap:1px;align-items:center">
+                            <button type="button" class="btn editor-btn" id="tb-align-left" title="왼쪽 정렬"
+                                style="min-width:22px;padding:2px 4px;font-size:11px">좌</button>
+                            <button type="button" class="btn editor-btn" id="tb-align-center" title="가운데 정렬"
+                                style="min-width:22px;padding:2px 4px;font-size:11px">중</button>
+                            <button type="button" class="btn editor-btn" id="tb-align-right" title="오른쪽 정렬"
+                                style="min-width:22px;padding:2px 4px;font-size:11px">우</button>
                         </div>
-                        <div th:if="${post.thumbnailUrl == null || #strings.isEmpty(post.thumbnailUrl)}"
-                            class="no-thumbnail-message">
-                            📷 현재 등록된 썸네일이 없습니다.
+                        <button type="button" class="btn editor-btn" id="tb-divider" title="구분선"
+                            style="min-width:22px;padding:2px 6px;font-size:11px">선</button>
+                        <span style="flex:1"></span>
+                        <div style="width:100%;display:flex;gap:4px;align-items:center">
+                            <button type="button" class="btn editor-btn" id="tb-image"
+                                style="min-width:24px;padding:2px 6px;font-size:11px">🖼 이미지</button>
+                            <button type="button" class="btn editor-btn" id="tb-video"
+                                style="min-width:24px;padding:2px 6px;font-size:11px">🎬 동영상</button>
+                            <button type="button" class="btn editor-btn" id="tb-map"
+                                style="min-width:24px;padding:2px 6px;font-size:11px">🗺 지도</button>
+                        </div>
+                    </div><br>
+                    <div class="form-group" style="margin-bottom:24px">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                            <label style="font-weight:600;margin-bottom:0;">썸네일 미리보기</label>
+                            <label
+                                style="font-size:13px;color:#666;display:flex;align-items:center;gap:2px;margin-bottom:0;white-space:nowrap;">
+                                <input type="checkbox" id="deleteThumbnail" name="deleteThumbnail" value="true"
+                                    style="margin-right:2px;transform:scale(0.9)"><span
+                                    style="display:inline;">삭제</span>
+                            </label>
+                        </div>
+                        <input type="file" id="thumbnailFileInput" name="thumbnailFile" accept="image/*"
+                            style="margin:10px 0 4px 0;">
+                        <small style="color:var(--muted);display:block;margin-top:4px">본문 이미지에 마우스를 올리고 좌측 상단의 ‘썸네일’ 버튼을
+                            눌러
+                            썸네일을 지정하세요.</small>
+                        <div id="thumbnailPreview" class="thumbnail-preview-container">
+                            <div th:if="${post.thumbnailUrl != null && !#strings.isEmpty(post.thumbnailUrl)}"
+                                id="currentThumbnail" class="current-thumbnail">
+                                <span class="thumbnail-preview-label">현재 썸네일:</span>
+                                <img th:src="${post.thumbnailUrl}" class="thumbnail-preview-image" alt="현재 썸네일">
+                            </div>
+                            <div th:if="${post.thumbnailUrl == null || #strings.isEmpty(post.thumbnailUrl)}"
+                                class="no-thumbnail-message">
+                                📷 현재 등록된 썸네일이 없습니다.
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="form-group" style="margin-bottom:0">
-                    <label for="imageFiles" style="font-weight:600">파일 업로드<br>(여러 개, 각 10MB 이하)</label>
-                    <input type="file" id="imageFiles" name="files" multiple style="margin-bottom:8px">
-                    <small style="color:var(--muted)">모든 형식의 파일을 첨부할 수 있습니다.</small>
-                    <div id="imagePreviewList"
-                        style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px">
+                    <div class="form-group" style="margin-bottom:0">
+                        <label for="imageFiles" style="font-weight:600">파일 업로드<br>(여러 개, 각 10MB 이하)</label>
+                        <input type="file" id="imageFiles" name="files" multiple style="margin-bottom:8px">
+                        <small style="color:var(--muted)">모든 형식의 파일을 첨부할 수 있습니다.</small>
+                        <div id="imagePreviewList"
+                            style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px">
+                        </div>
                     </div>
-                </div>
 
-                <!-- 기존 첨부파일 목록 (체크삭제) -->
-                <div class="form-group" style="margin-top:16px">
-                    <label style="font-weight:600">현재 첨부된 파일</label>
-                    <div th:if="${post.images != null and !#lists.isEmpty(post.images)}"
-                         style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
-                        <div th:each="img : ${post.images}"
-                             style="display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:8px;border:1px solid #e6e8eb;border-radius:6px;padding:8px;background:#fff">
-                            <input type="checkbox" name="deleteImageIds" th:value="${img.id}"
-                                   th:id="${'del-img-' + img.id}" style="margin:0" />
-                            <label th:for="${'del-img-' + img.id}"
-                                   th:text="${img.caption != null && !#strings.isEmpty(img.caption) ? img.caption : (img.imageUrl != null ? (img.imageUrl.contains('/') ? img.imageUrl.substring(img.imageUrl.lastIndexOf('/') + 1) : img.imageUrl) : 'file')}"
-                                   th:title="${img.caption != null && !#strings.isEmpty(img.caption) ? img.caption : (img.imageUrl != null ? (img.imageUrl.contains('/') ? img.imageUrl.substring(img.imageUrl.lastIndexOf('/') + 1) : img.imageUrl) : 'file')}"
-                                   style="margin:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;direction:rtl;unicode-bidi:plaintext;"></label>
+                    <!-- 기존 첨부파일 목록 (체크삭제) -->
+                    <div class="form-group" style="margin-top:16px">
+                        <label style="font-weight:600">현재 첨부된 파일</label>
+                        <div th:if="${post.images != null and !#lists.isEmpty(post.images)}"
+                            style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
+                            <div th:each="img : ${post.images}"
+                                style="display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:8px;border:1px solid #e6e8eb;border-radius:6px;padding:8px;background:#fff">
+                                <input type="checkbox" name="deleteImageIds" th:value="${img.id}"
+                                    th:id="${'del-img-' + img.id}" style="margin:0" />
+                                <label th:for="${'del-img-' + img.id}"
+                                    th:text="${img.caption != null && !#strings.isEmpty(img.caption) ? img.caption : (img.imageUrl != null ? (img.imageUrl.contains('/') ? img.imageUrl.substring(img.imageUrl.lastIndexOf('/') + 1) : img.imageUrl) : 'file')}"
+                                    th:title="${img.caption != null && !#strings.isEmpty(img.caption) ? img.caption : (img.imageUrl != null ? (img.imageUrl.contains('/') ? img.imageUrl.substring(img.imageUrl.lastIndexOf('/') + 1) : img.imageUrl) : 'file')}"
+                                    style="margin:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;direction:rtl;unicode-bidi:plaintext;"></label>
+                            </div>
+                            <small style="color:var(--muted)">체크한 파일은 저장 시 삭제됩니다.</small>
                         </div>
-                        <small style="color:var(--muted)">체크한 파일은 저장 시 삭제됩니다.</small>
+                        <div th:if="${post.images == null or #lists.isEmpty(post.images)}"
+                            style="color:var(--muted);font-size:13px;margin-top:6px">
+                            첨부된 파일이 없습니다.
+                        </div>
                     </div>
-                    <div th:if="${post.images == null or #lists.isEmpty(post.images)}" style="color:var(--muted);font-size:13px;margin-top:6px">
-                        첨부된 파일이 없습니다.
-                    </div>
-                </div>
 
-                <!-- 기존 일반 파일 목록 (files_url 기반, 체크삭제) -->
-                <div class="form-group" style="margin-top:12px">
-                    <label style="font-weight:600">현재 일반 파일</label>
-                    <div th:if="${post.filesUrl != null && !#strings.isEmpty(post.filesUrl)}"
-                         style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
-                        <div th:each="fUrl : ${#strings.arraySplit(post.filesUrl, ',')}"
-                             th:with="fileName=${fUrl != null ? fUrl.substring(fUrl.lastIndexOf('/') + 1) : ''}"
-                             style="display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:8px;border:1px solid #e6e8eb;border-radius:6px;padding:8px;background:#fff">
-                            <input type="checkbox" name="deleteFileUrls" th:value="${fUrl}"
-                                   th:id="${'del-file-' + fileName}" style="margin:0" />
-                            <label th:for="${'del-file-' + fileName}"
-                                   th:text="${fileName}"
-                                   th:title="${fUrl}"
-                                   style="margin:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;direction:rtl;unicode-bidi:plaintext;"></label>
-                            <a th:href="${fUrl}" target="_blank" style="font-size:12px;text-decoration:none;color:var(--accent)">보기</a>
+                    <!-- 기존 일반 파일 목록 (files_url 기반, 체크삭제) -->
+                    <div class="form-group" style="margin-top:12px">
+                        <label style="font-weight:600">현재 일반 파일</label>
+                        <div th:if="${post.filesUrl != null && !#strings.isEmpty(post.filesUrl)}"
+                            style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
+                            <div th:each="fUrl : ${#strings.arraySplit(post.filesUrl, ',')}"
+                                th:with="fileName=${fUrl != null ? fUrl.substring(fUrl.lastIndexOf('/') + 1) : ''}"
+                                style="display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:8px;border:1px solid #e6e8eb;border-radius:6px;padding:8px;background:#fff">
+                                <input type="checkbox" name="deleteFileUrls" th:value="${fUrl}"
+                                    th:id="${'del-file-' + fileName}" style="margin:0" />
+                                <label th:for="${'del-file-' + fileName}" th:text="${fileName}" th:title="${fUrl}"
+                                    style="margin:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;direction:rtl;unicode-bidi:plaintext;"></label>
+                                <a th:href="${fUrl}" target="_blank"
+                                    style="font-size:12px;text-decoration:none;color:var(--accent)">보기</a>
+                            </div>
+                            <small style="color:var(--muted)">체크한 일반 파일은 저장 시 삭제됩니다.</small>
                         </div>
-                        <small style="color:var(--muted)">체크한 일반 파일은 저장 시 삭제됩니다.</small>
+                        <div th:if="${post.filesUrl == null || #strings.isEmpty(post.filesUrl)}"
+                            style="color:var(--muted);font-size:13px;margin-top:6px">
+                            등록된 일반 파일이 없습니다.
+                        </div>
                     </div>
-                    <div th:if="${post.filesUrl == null || #strings.isEmpty(post.filesUrl)}" style="color:var(--muted);font-size:13px;margin-top:6px">
-                        등록된 일반 파일이 없습니다.
-                    </div>
-                </div>
                 </aside>
             </form>
     </main>

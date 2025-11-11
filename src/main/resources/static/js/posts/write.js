@@ -46,6 +46,8 @@ const tbAlignRight = document.getElementById('tb-align-right');
 const tbFontFamily = document.getElementById('tb-fontFamily');
 const tbFontSize = document.getElementById('tb-fontSize');
 const tbDivider = document.getElementById('tb-divider');
+const templateCategory = document.getElementById('templateCategory');
+const insertTemplateBtn = document.getElementById('insertTemplateBtn');
 
 const preview = document.getElementById('livePreview');
 const textarea = document.getElementById('content');
@@ -244,6 +246,94 @@ if (tbUnderline) tbUnderline.addEventListener('click', () => { preview.focus(); 
 // 구분선 삽입
 if (tbDivider) tbDivider.addEventListener('click', () => {
   insertHtmlAtCursor('<hr class="post-divider" style="border:none;border-top:1px solid #e6e8eb;margin:16px 0">');
+});
+
+// 카테고리 템플릿
+const CATEGORY_TEMPLATES = {
+  '일상': `
+    <h2>오늘의 일상 기록</h2>
+    <p>안녕하세요. 오늘 하루를 기록해 봅니다.</p>
+    <h3>하이라이트</h3>
+    <ul>
+      <li>아침: 간단한 운동과 커피</li>
+      <li>점심: 동료들과 식사</li>
+      <li>저녁: 산책하며 하루 마무리</li>
+    </ul>
+    <p>작은 루틴들이 쌓여 큰 변화를 만든다고 믿어요 :)</p>
+  `,
+  '기술': `
+    <h2>[기술] 문제 정의와 해결 과정</h2>
+    <h3>배경</h3>
+    <p>현재 겪고 있는 기술적 이슈를 정리합니다.</p>
+    <h3>환경</h3>
+    <ul>
+      <li>OS/Runtime:</li>
+      <li>Framework/Library:</li>
+      <li>버전:</li>
+    </ul>
+    <h3>접근법</h3>
+    <ol>
+      <li>원인 가설 수립</li>
+      <li>재현 및 로그 분석</li>
+      <li>해결 및 검증</li>
+    </ol>
+    <h3>결론</h3>
+    <p>핵심 요약과 다음 액션을 남깁니다.</p>
+  `,
+  '여행': `
+    <h2>여행기: 장소/도시 이름</h2>
+    <p>여행 일정과 감상을 기록해요.</p>
+    <h3>코스</h3>
+    <ol>
+      <li>1일차: 이동 및 체크인</li>
+      <li>2일차: 주요 명소 관람</li>
+      <li>3일차: 로컬 맛집 탐방</li>
+    </ol>
+    <h3>Tip</h3>
+    <p>교통/숙소/환전 등 유용한 팁을 정리합니다.</p>
+  `,
+  '맛집': `
+    <h2>맛집 리뷰: 식당 이름</h2>
+    <h3>기본 정보</h3>
+    <ul>
+      <li>위치:</li>
+      <li>영업시간:</li>
+      <li>대표 메뉴:</li>
+    </ul>
+    <h3>후기</h3>
+    <p>맛/가격/서비스/분위기를 중심으로 솔직 리뷰를 남겨요.</p>
+  `,
+  '취미': `
+    <h2>취미 로그: 주제</h2>
+    <h3>시작 동기</h3>
+    <p>이 취미를 시작하게 된 계기.</p>
+    <h3>진행 상황</h3>
+    <ul>
+      <li>준비물/자료:</li>
+      <li>연습/만들기 기록:</li>
+    </ul>
+    <h3>느낀 점</h3>
+    <p>배운 점과 다음 목표를 적어봅니다.</p>
+  `,
+};
+
+if (insertTemplateBtn) insertTemplateBtn.addEventListener('click', () => {
+  const cat = templateCategory ? templateCategory.value : '';
+  if (!cat) { alert('카테고리를 선택하세요.'); return; }
+  const html = CATEGORY_TEMPLATES[cat];
+  if (!html) { alert('해당 카테고리 템플릿이 없습니다.'); return; }
+  const hasContent = (preview.innerHTML || '').trim().length > 0;
+  if (!hasContent) {
+    preview.innerHTML = html;
+  } else {
+    if (confirm('현재 내용을 템플릿으로 대체할까요? 취소를 누르면 커서 위치에 삽입합니다.')) {
+      preview.innerHTML = html;
+    } else {
+      insertHtmlAtCursor(html);
+    }
+  }
+  textarea.value = preview.innerHTML;
+  preview.focus();
 });
 
 // 색상/폰트

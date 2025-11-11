@@ -177,6 +177,27 @@
                     </div>
                     <br>
 
+                    <!-- 템플릿: 카테고리별 예시 본문 넣기 -->
+                    <div class="form-group" style="margin-bottom:16px">
+                        <label for="templateCategory" style="font-weight:600">템플릿</label>
+                        <small style="color:var(--muted);display:block;margin-top:4px">
+                            우측에서 카테고리를 선택 후 “예시 불러오기”를 누르면 본문 영역에 템플릿을 삽입합니다.
+                        </small>
+                        <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+                            <select id="templateCategory" class="editor-select"
+                                style="padding:6px 8px;border:1px solid #dcdde1;border-radius:6px;background:#fff;font-size:13px;flex:1">
+                                <option value="">카테고리 선택</option>
+                                <option value="일상">일상</option>
+                                <option value="기술">기술</option>
+                                <option value="여행">여행</option>
+                                <option value="맛집">맛집</option>
+                                <option value="취미">취미</option>
+                            </select>
+                            <button type="button" id="insertTemplateBtn" class="btn btn-secondary"
+                                style="white-space:nowrap">예시 불러오기</button>
+                        </div>
+                    </div>
+
                     <!-- 썸네일 파일 업로드 + 미리보기 -->
                     <div class="form-group" style="margin-bottom:24px">
                         <label style="font-weight:600">썸네일</label>

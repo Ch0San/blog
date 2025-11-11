@@ -41,11 +41,6 @@
                         <input type="text" id="title" name="title" th:value="${post.title}" placeholder="제목을 입력하세요"
                             required
                             style="flex:1;padding:12px 14px;border:1px solid #dcdde1;border-radius:6px;font-size:16px">
-                        <label
-                            style="display:flex;align-items:center;gap:2px;color:#666;font-size:13px;white-space:nowrap;margin-left:4px;">
-                            <input type="checkbox" id="isPublic" name="isPublic" th:checked="${post.isPublic}"
-                                style="margin-right:2px;">공개
-                        </label>
                     </div>
                     <div style="display:flex;gap:8px;align-items:center">
                         <input type="text" id="author" name="author" th:value="${post.author}" placeholder="작성자"
@@ -129,6 +124,8 @@
                             <option value="28px">28px</option>
                             <option value="32px">32px</option>
                         </select>
+                        <button type="button" class="btn editor-btn" id="tb-divider" title="구분선"
+                            style="min-width:22px;padding:2px 6px;font-size:11px">선</button>
                         <button type="button" class="btn editor-btn" id="tb-bold" title="볼드"
                             style="min-width:22px;padding:2px 4px;font-size:11px">B</button>
                         <button type="button" class="btn editor-btn" id="tb-italic" title="이탤릭"
@@ -148,8 +145,6 @@
                             <button type="button" class="btn editor-btn" id="tb-align-right" title="오른쪽 정렬"
                                 style="min-width:22px;padding:2px 4px;font-size:11px">우</button>
                         </div>
-                        <button type="button" class="btn editor-btn" id="tb-divider" title="구분선"
-                            style="min-width:22px;padding:2px 6px;font-size:11px">선</button>
                         <span style="flex:1"></span>
                         <div style="width:100%;display:flex;gap:4px;align-items:center">
                             <button type="button" class="btn editor-btn" id="tb-image"

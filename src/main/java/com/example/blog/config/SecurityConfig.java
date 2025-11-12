@@ -43,7 +43,9 @@ public class SecurityConfig {
                                                                 "/uploads/**")
                                                 .permitAll()
                                                 // ?덊럹?댁?, ?뚯썝媛?? 濡쒓렇???섏씠吏??紐⑤몢 ?묎렐 媛??
-                                                .requestMatchers("/", "/index.html", "/signup", "/login", "/error", "/401").permitAll()
+                                                .requestMatchers("/", "/index.html", "/signup", "/login", "/error",
+                                                                "/401")
+                                                .permitAll()
                                                 // 怨듭??ы빆 議고쉶??紐⑤몢 ?묎렐 媛??(紐⑸줉/?곸꽭)
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/notice",
@@ -115,16 +117,21 @@ public class SecurityConfig {
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(ex -> ex
                                                 .defaultAuthenticationEntryPointFor(
-                                                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                                                    new org.springframework.security.web.util.matcher.OrRequestMatcher(
-                                                        new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/**"),
-                                                        new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/posts/*/like"),
-                                                        new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/comments/*/like"),
-                                                        new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/stories/*/like"),
-                                                        new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/stories/comments/*/like"),
-                                                        new org.springframework.security.web.util.matcher.RequestHeaderRequestMatcher("X-Requested-With", "XMLHttpRequest")
-                                                    )
-                                                ))
+                                                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                                                                new org.springframework.security.web.util.matcher.OrRequestMatcher(
+                                                                                new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                                                                                "/api/**"),
+                                                                                new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                                                                                "/posts/*/like"),
+                                                                                new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                                                                                "/comments/*/like"),
+                                                                                new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                                                                                "/stories/*/like"),
+                                                                                new org.springframework.security.web.util.matcher.AntPathRequestMatcher(
+                                                                                                "/stories/comments/*/like"),
+                                                                                new org.springframework.security.web.util.matcher.RequestHeaderRequestMatcher(
+                                                                                                "X-Requested-With",
+                                                                                                "XMLHttpRequest"))))
                                 .formLogin(form -> form
                                                 .loginPage("/member/signin") // 而ㅼ뒪? 濡쒓렇???섏씠吏
                                                 .loginProcessingUrl("/member/signin") // 濡쒓렇??泥섎━ URL
@@ -145,4 +152,3 @@ public class SecurityConfig {
 
         // UserDetailsService??CustomUserDetailsService(@Service) 鍮덉씠 ?먮룞 二쇱엯?⑸땲??
 }
-

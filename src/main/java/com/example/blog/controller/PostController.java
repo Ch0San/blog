@@ -139,9 +139,9 @@ public class PostController {
     /**
      * 게시글 목록 페이지를 조회합니다.
      *
-     * @param page      0부터 시작하는 페이지 번호
-     * @param category  선택적 카테고리명
-     * @param model     뷰 렌더링용 모델
+     * @param page     0부터 시작하는 페이지 번호
+     * @param category 선택적 카테고리명
+     * @param model    뷰 렌더링용 모델
      * @return 목록 뷰 이름(`posts/list`)
      */
     @GetMapping("/posts")
@@ -218,8 +218,8 @@ public class PostController {
     /**
      * 게시글 상세 페이지를 조회합니다. 조회수는 1 증가합니다.
      *
-     * @param id    게시글 식별자
-     * @param model 뷰 렌더링용 모델
+     * @param id             게시글 식별자
+     * @param model          뷰 렌더링용 모델
      * @param authentication 인증 정보(있으면 좋아요/댓글 좋아요 상태 포함)
      * @return 상세 뷰 이름(`posts/detail`), 존재하지 않으면 목록으로 리다이렉트
      */
@@ -282,19 +282,19 @@ public class PostController {
     /**
      * 새 게시글을 생성합니다. 썸네일/이미지/파일 업로드를 처리합니다.
      *
-     * @param title           제목
-     * @param author          작성자 표시명
-     * @param content         본문 HTML
-     * @param category        선택적 카테고리
-     * @param tags            선택적 태그
-     * @param thumbnailFile   선택적 업로드 썸네일 파일
+     * @param title             제목
+     * @param author            작성자 표시명
+     * @param content           본문 HTML
+     * @param category          선택적 카테고리
+     * @param tags              선택적 태그
+     * @param thumbnailFile     선택적 업로드 썸네일 파일
      * @param thumbnailUrlParam 선택적 기존 썸네일 URL(hidden)
-     * @param videoUrl        선택적 동영상 URL
-     * @param imageFiles      선택적 이미지 파일 목록
-     * @param files           선택적 일반 파일 목록
-     * @param imageUrls       선택적 본문 내 이미지 URL 목록(콤마 구분)
-     * @param isPublic        공개 여부
-     * @param session         임시 업로드 경로 보관 세션
+     * @param videoUrl          선택적 동영상 URL
+     * @param imageFiles        선택적 이미지 파일 목록
+     * @param files             선택적 일반 파일 목록
+     * @param imageUrls         선택적 본문 내 이미지 URL 목록(콤마 구분)
+     * @param isPublic          공개 여부
+     * @param session           임시 업로드 경로 보관 세션
      * @return 생성 후 목록으로 리다이렉트. 업로드 오류 시 폼으로 리다이렉트
      */
     @PostMapping(value = "/posts/write", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -318,7 +318,6 @@ public class PostController {
         post.setContent(content);
         post.setCategory(category);
         post.setTags(tags);
-
 
         // 썸네일 결정: 업로드 파일 > 클라이언트 선택 URL(hidden input)
         String chosenThumbnail = null;
@@ -368,7 +367,8 @@ public class PostController {
                 java.nio.file.Path filesRoot = java.nio.file.Paths.get("uploads", "files");
                 java.nio.file.Files.createDirectories(filesRoot);
                 for (MultipartFile f : files) {
-                    if (f == null || f.isEmpty()) continue;
+                    if (f == null || f.isEmpty())
+                        continue;
                     if (f.getSize() > 10L * 1024 * 1024) {
                         return "redirect:/posts/write?error=FILE_TOO_LARGE";
                     }
@@ -433,22 +433,22 @@ public class PostController {
     /**
      * 게시글을 수정합니다. 썸네일 교체/삭제, 이미지·파일 추가/삭제를 처리합니다.
      *
-     * @param id               게시글 식별자
-     * @param title            제목
-     * @param author           작성자 표시명
-     * @param content          본문 HTML
-     * @param category         카테고리
-     * @param tags             태그
-     * @param thumbnailFile    선택적 교체용 썸네일 파일
+     * @param id                게시글 식별자
+     * @param title             제목
+     * @param author            작성자 표시명
+     * @param content           본문 HTML
+     * @param category          카테고리
+     * @param tags              태그
+     * @param thumbnailFile     선택적 교체용 썸네일 파일
      * @param thumbnailUrlParam 선택적 교체용 썸네일 URL
-     * @param deleteThumbnail  썸네일 삭제 여부
-     * @param deleteImageIds   삭제할 이미지 ID 목록
-     * @param deleteFileUrls   삭제할 파일 URL 목록
-     * @param files            추가할 파일 목록
-     * @param imageFiles       추가할 이미지 목록
-     * @param imageUrls        본문 내 이미지 URL 목록
-     * @param isPublic         공개 여부
-     * @param session          임시 업로드 경로 보관 세션
+     * @param deleteThumbnail   썸네일 삭제 여부
+     * @param deleteImageIds    삭제할 이미지 ID 목록
+     * @param deleteFileUrls    삭제할 파일 URL 목록
+     * @param files             추가할 파일 목록
+     * @param imageFiles        추가할 이미지 목록
+     * @param imageUrls         본문 내 이미지 URL 목록
+     * @param isPublic          공개 여부
+     * @param session           임시 업로드 경로 보관 세션
      * @return 수정 후 상세로 리다이렉트. 오류 시 폼으로 리다이렉트
      */
     @PostMapping("/posts/edit/{id}")
@@ -484,7 +484,8 @@ public class PostController {
         if (deleteFileUrls != null && !deleteFileUrls.isEmpty()) {
             String existing = post.getFilesUrl();
             if (existing != null && !existing.isBlank()) {
-                java.util.List<String> current = new java.util.ArrayList<>(java.util.Arrays.asList(existing.split(",")));
+                java.util.List<String> current = new java.util.ArrayList<>(
+                        java.util.Arrays.asList(existing.split(",")));
                 java.util.Iterator<String> it = current.iterator();
                 while (it.hasNext()) {
                     String url = it.next().trim();
@@ -511,8 +512,7 @@ public class PostController {
 
             String newThumb = saveThumbnailFile(thumbnailFile);
             post.setThumbnailUrl(newThumb);
-        }
-        else if (thumbnailUrlParam != null && !thumbnailUrlParam.isBlank()) {
+        } else if (thumbnailUrlParam != null && !thumbnailUrlParam.isBlank()) {
             String existingThumbnail = post.getThumbnailUrl();
             deleteImageFileByUrl(existingThumbnail);
             post.setThumbnailUrl(normalizeWebPath(thumbnailUrlParam));
@@ -563,7 +563,8 @@ public class PostController {
                 java.nio.file.Path filesRoot = java.nio.file.Paths.get("uploads", "files");
                 java.nio.file.Files.createDirectories(filesRoot);
                 for (MultipartFile f : files) {
-                    if (f == null || f.isEmpty()) continue;
+                    if (f == null || f.isEmpty())
+                        continue;
                     if (f.getSize() > 10L * 1024 * 1024) {
                         return "redirect:/posts/edit/" + id + "?error=FILE_TOO_LARGE";
                     }
@@ -685,7 +686,8 @@ public class PostController {
                 return ResponseEntity.notFound().build();
             }
             String contentType = Files.probeContentType(filePath);
-            if (contentType == null) contentType = "application/octet-stream";
+            if (contentType == null)
+                contentType = "application/octet-stream";
             String originalFilename = filename;
             if (filename.contains("-") && filename.length() > 36) {
                 int lastDashIndex = filename.lastIndexOf('-');
@@ -775,7 +777,8 @@ public class PostController {
 
     // 일반 파일 삭제 메서드 (URL 기반, uploads/files 하위만 허용)
     private void deleteAttachmentFileByUrl(String existingUrl) {
-        if (existingUrl == null || existingUrl.isBlank()) return;
+        if (existingUrl == null || existingUrl.isBlank())
+            return;
         try {
             if (existingUrl.startsWith("/uploads/files/")) {
                 String existingName = existingUrl.substring(existingUrl.lastIndexOf('/') + 1);

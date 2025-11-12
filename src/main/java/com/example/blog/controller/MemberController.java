@@ -52,10 +52,10 @@ public class MemberController {
     /**
      * 회원 가입을 처리합니다.
      *
-     * @param username 아이디
-     * @param password 비밀번호(평문 전달, 서비스에서 인코딩 권장)
-     * @param nickname 닉네임
-     * @param email    이메일
+     * @param username    아이디
+     * @param password    비밀번호(평문 전달, 서비스에서 인코딩 권장)
+     * @param nickname    닉네임
+     * @param email       이메일
      * @param phoneNumber 전화번호(선택)
      * @param address     주소(선택)
      * @return 홈으로 리다이렉트
@@ -279,14 +279,14 @@ public class MemberController {
     /**
      * 회원 관리 수정 처리(관리자).
      *
-     * @param id         회원 식별자
-     * @param nickname   닉네임
-     * @param email      이메일
+     * @param id          회원 식별자
+     * @param nickname    닉네임
+     * @param email       이메일
      * @param phoneNumber 전화번호(선택)
-     * @param address    주소(선택)
-     * @param role       역할
-     * @param active     활성 여부
-     * @param password   새 비밀번호(선택; 제공 시 평문 -> 인코딩 필요)
+     * @param address     주소(선택)
+     * @param role        역할
+     * @param active      활성 여부
+     * @param password    새 비밀번호(선택; 제공 시 평문 -> 인코딩 필요)
      * @return 목록으로 리다이렉트(+표시용 쿼리)
      */
     @PostMapping("/admin/edit/{id}")

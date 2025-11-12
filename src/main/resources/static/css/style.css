@@ -1220,12 +1220,20 @@ footer {
   word-break: break-word
 }
 
+/* Contain floated elements inside post content */
+.post-content::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
 /* Post content responsive media */
 .post-content img {
   max-width: 100%;
   height: auto;
   display: inline-block;
 }
+
 .post-content video,
 .post-content iframe {
   max-width: 100%;
@@ -1233,23 +1241,74 @@ footer {
   height: auto;
   display: block;
 }
+
+/* Front-end float helpers */
+.post-content .image-float-left {
+  float: left;
+  margin: 0 16px 8px 0;
+  max-width: 48%;
+}
+
+.post-content .image-float-right {
+  float: right;
+  margin: 0 0 8px 16px;
+  max-width: 48%;
+}
+
+.post-content .image-centered {
+  text-align: center;
+}
+
+.post-content .image-float-left img,
+.post-content .image-float-right img,
+.post-content .image-centered img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Mobile: cancel floats to prevent overflow */
+@media (max-width: 768px) {
+
+  .post-content .image-float-left,
+  .post-content .image-float-right {
+    float: none;
+    margin: 0 auto 1rem;
+    max-width: 100%;
+  }
+
+  /* Defensive: inline float styles from content */
+  .post-content [style*="float:left"],
+  .post-content [style*="float: left"],
+  .post-content [style*="float:right"],
+  .post-content [style*="float: right"] {
+    float: none !important;
+    margin: 0 auto 1rem !important;
+    max-width: 100% !important;
+  }
+}
+
 .post-content img.resizable-media {
   max-width: 100%;
   height: auto;
 }
+
 .post-content .resizable-video,
 .post-content .kmap {
   max-width: 100%;
 }
- .post-content .resizable-map { 
+
+.post-content .resizable-map {
   min-height: 240px;
 }
+
 .post-content table {
   width: 100%;
   border-collapse: collapse;
   display: block;
   overflow-x: auto;
 }
+
 .post-content table td,
 .post-content table th {
   border: 1px solid #e5e7eb;
@@ -1654,25 +1713,31 @@ footer {
   .post-detail {
     padding: 20px;
   }
+
   .post-title {
     font-size: 26px;
   }
+
   .post-meta-info {
     flex-wrap: wrap;
     row-gap: 6px;
   }
+
   .related-post-card {
     gap: 10px;
   }
+
   .related-post-thumbnail {
     width: 64px;
     height: 64px;
   }
 }
+
 @media (max-width: 480px) {
   .post-title {
     font-size: 22px;
   }
+
   .post-content .resizable-map {
     min-height: 220px;
   }
@@ -1782,6 +1847,3 @@ footer {
   color: var(--muted);
   font-size: 14px
 }
-
-
-

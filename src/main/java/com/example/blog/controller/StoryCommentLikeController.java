@@ -26,7 +26,7 @@ public class StoryCommentLikeController {
     /**
      * 스토리 댓글 좋아요를 토글합니다(인증 필요).
      *
-     * @param commentId 댓글 식별자
+     * @param commentId      댓글 식별자
      * @param authentication 인증 정보(사용자 식별)
      * @return `isLiked`, `likeCount`를 포함한 JSON 응답
      */

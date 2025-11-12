@@ -21,8 +21,9 @@ public class CommentController {
 
     /**
      * 댓글 생성(인증 필요).
-     * @param postId 게시글 ID
-     * @param content 댓글 내용
+     * 
+     * @param postId         게시글 ID
+     * @param content        댓글 내용
      * @param authentication 인증 정보(작성자 식별)
      * @return 게시글 상세로 리다이렉트
      */
@@ -38,8 +39,9 @@ public class CommentController {
 
     /**
      * 댓글 삭제(인증 필요).
+     * 
      * @param commentId 댓글 ID
-     * @param postId 소속 게시글 ID
+     * @param postId    소속 게시글 ID
      * @return 게시글 상세로 리다이렉트
      */
     @PostMapping("/comments/{commentId}/delete")
@@ -52,9 +54,10 @@ public class CommentController {
 
     /**
      * 댓글 수정(인증 필요). 작성자 본인만 수정 가능합니다.
-     * @param commentId 댓글 ID
-     * @param postId 소속 게시글 ID
-     * @param content 변경할 내용
+     * 
+     * @param commentId      댓글 ID
+     * @param postId         소속 게시글 ID
+     * @param content        변경할 내용
      * @param authentication 인증 정보(작성자 확인)
      * @return 게시글 상세로 리다이렉트(실패 시 오류 메시지 쿼리 포함)
      */

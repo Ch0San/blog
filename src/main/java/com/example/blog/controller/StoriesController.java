@@ -60,9 +60,9 @@ public class StoriesController {
      * 기본 페이지 크기는 12이며, 카테고리 필터가 지정되면 해당 카테고리로 필터링합니다.
      * </p>
      *
-     * @param page      0부터 시작하는 페이지 번호
-     * @param category  선택적 카테고리명(없으면 전체)
-     * @param model     뷰 렌더링에 사용할 모델
+     * @param page     0부터 시작하는 페이지 번호
+     * @param category 선택적 카테고리명(없으면 전체)
+     * @param model    뷰 렌더링에 사용할 모델
      * @return 목록 뷰 이름(`stories/list`)
      */
     @GetMapping("/stories")
@@ -162,9 +162,9 @@ public class StoriesController {
     /**
      * 스토리에 댓글을 생성합니다.
      *
-     * @param id           스토리 식별자
-     * @param content      댓글 내용(필수)
-     * @param userDetails  인증 사용자 정보(필수)
+     * @param id          스토리 식별자
+     * @param content     댓글 내용(필수)
+     * @param userDetails 인증 사용자 정보(필수)
      * @return 상세 페이지로 리다이렉트, 미인증 시 로그인 페이지로 리다이렉트
      */
     @PostMapping("/stories/{id}/comments")
@@ -190,9 +190,9 @@ public class StoriesController {
     /**
      * 스토리 댓글을 삭제합니다. 작성자 본인만 삭제할 수 있습니다.
      *
-     * @param commentId    댓글 식별자
-     * @param storyId      소속 스토리 식별자
-     * @param userDetails  인증 사용자 정보(필수)
+     * @param commentId   댓글 식별자
+     * @param storyId     소속 스토리 식별자
+     * @param userDetails 인증 사용자 정보(필수)
      * @return 상세 페이지로 리다이렉트. 권한 오류 시 `?error=메시지` 쿼리 파라미터 포함
      */
     @PostMapping("/stories/comments/{commentId}/delete")
@@ -217,10 +217,10 @@ public class StoriesController {
     /**
      * 스토리 댓글을 수정합니다. 작성자 본인만 수정할 수 있습니다.
      *
-     * @param commentId    댓글 식별자
-     * @param content      변경할 내용
-     * @param storyId      소속 스토리 식별자
-     * @param userDetails  인증 사용자 정보(필수)
+     * @param commentId   댓글 식별자
+     * @param content     변경할 내용
+     * @param storyId     소속 스토리 식별자
+     * @param userDetails 인증 사용자 정보(필수)
      * @return 상세 페이지로 리다이렉트. 권한 오류 시 `?error=메시지` 쿼리 파라미터 포함
      */
     @PostMapping("/stories/comments/{commentId}/update")
@@ -349,16 +349,16 @@ public class StoriesController {
     /**
      * 스토리를 수정합니다. 선택적으로 영상/썸네일 교체 및 썸네일 삭제를 처리합니다.
      *
-     * @param id             스토리 식별자
-     * @param title          제목
-     * @param author         작성자 표시명
-     * @param description    설명/본문 요약
-     * @param category       선택적 카테고리
-     * @param tags           선택적 태그
-     * @param videoFile      선택적 교체용 동영상 파일
-     * @param thumbnailFile  선택적 교체용 썸네일 이미지 파일
+     * @param id              스토리 식별자
+     * @param title           제목
+     * @param author          작성자 표시명
+     * @param description     설명/본문 요약
+     * @param category        선택적 카테고리
+     * @param tags            선택적 태그
+     * @param videoFile       선택적 교체용 동영상 파일
+     * @param thumbnailFile   선택적 교체용 썸네일 이미지 파일
      * @param deleteThumbnail 썸네일 삭제 여부(true 시 기존 파일 삭제)
-     * @param model          에러 메시지 표시에 사용
+     * @param model           에러 메시지 표시에 사용
      * @return 수정 후 상세로 리다이렉트, 실패 시 수정 폼으로 이동
      */
     @PostMapping("/stories/edit/{id}")

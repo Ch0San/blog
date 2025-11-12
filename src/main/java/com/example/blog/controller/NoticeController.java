@@ -28,8 +28,8 @@ public class NoticeController {
     /**
      * 공지사항 목록을 페이지로 조회합니다.
      *
-     * @param page 0부터 시작하는 페이지 번호
-     * @param size 페이지 크기
+     * @param page  0부터 시작하는 페이지 번호
+     * @param size  페이지 크기
      * @param model 뷰 렌더링용 모델
      * @return 목록 뷰 이름(`notice/list`)
      */
@@ -47,7 +47,7 @@ public class NoticeController {
     /**
      * 공지사항 상세를 조회합니다. 조회수는 1 증가합니다.
      *
-     * @param id 공지사항 식별자
+     * @param id    공지사항 식별자
      * @param model 뷰 렌더링용 모델
      * @return 상세 뷰 이름(`notice/detail`), 없으면 404 조각 뷰
      */
@@ -98,7 +98,7 @@ public class NoticeController {
     /**
      * 공지사항 수정 폼(관리자).
      *
-     * @param id 공지사항 식별자
+     * @param id    공지사항 식별자
      * @param model 뷰 렌더링용 모델
      * @return 수정 폼 뷰 이름(`notice/edit`), 없으면 404 조각 뷰
      */
@@ -115,9 +115,9 @@ public class NoticeController {
     /**
      * 공지사항 수정(관리자).
      *
-     * @param id 공지사항 식별자
-     * @param title 제목(필수)
-     * @param author 작성자 표시명(필수)
+     * @param id      공지사항 식별자
+     * @param title   제목(필수)
+     * @param author  작성자 표시명(필수)
      * @param content 본문(필수)
      * @return 상세로 리다이렉트
      */

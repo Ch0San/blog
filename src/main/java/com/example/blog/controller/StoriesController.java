@@ -183,7 +183,7 @@ public class StoriesController {
 
         storyCommentService.createComment(id, content, nickname, userDetails.getUsername());
 
-        return "redirect:/stories/" + id;
+        return "redirect:/stories/" + id + "?success=댓글이 등록되었습니다.";
     }
 
     // 스토리 댓글 삭제
@@ -210,7 +210,7 @@ public class StoriesController {
             return "redirect:/stories/" + storyId + "?error=" + e.getMessage();
         }
 
-        return "redirect:/stories/" + storyId;
+        return "redirect:/stories/" + storyId + "?success=댓글이 삭제되었습니다.";
     }
 
     // 스토리 댓글 수정
@@ -239,7 +239,7 @@ public class StoriesController {
             return "redirect:/stories/" + storyId + "?error=" + e.getMessage();
         }
 
-        return "redirect:/stories/" + storyId;
+        return "redirect:/stories/" + storyId + "?success=댓글이 수정되었습니다.";
     }
 
     // 스토리 작성 페이지

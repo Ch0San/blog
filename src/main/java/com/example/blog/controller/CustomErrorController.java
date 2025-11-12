@@ -28,7 +28,9 @@ public class CustomErrorController implements ErrorController {
         if (status != null) {
             int statusCode = Integer.parseInt(status.toString());
 
-            if (statusCode == HttpStatus.FORBIDDEN.value()) {
+            if (statusCode == HttpStatus.UNAUTHORIZED.value()) {
+                return "fragments/index_401";
+            } else if (statusCode == HttpStatus.FORBIDDEN.value()) {
                 return "fragments/index_403";
             } else if (statusCode == HttpStatus.NOT_FOUND.value()) {
                 return "fragments/index_404";

@@ -1,4 +1,52 @@
-﻿# v0.0.0.3 - 2025-11-10
+﻿# v0.0.0.5 - 2025-11-12
+
+변경 요약(한글)
+- 인증/에러 처리
+  - SecurityConfig: AJAX·API·좋아요 요청(XHR 포함)에만 401 응답, 일반 페이지는 폼 로그인 리다이렉트 유지. /error, /401 허용.
+  - CustomErrorController: 401 상태 코드 시 ragments/index_401 렌더링.
+  - 401 페이지 추가: 	emplates/fragments/index_401.html(로그인 유도, 공통 헤더/푸터, 통일된 스타일).
+  - 403/404/500 페이지: 한글 문구/아이콘 통일 및 중복 마크업 정리.
+
+- 댓글/좋아요 UX 개선
+  - CommentController: UTF-8로 재작성, 댓글 생성/수정/삭제 후 ?success= 메시지 통일(“댓글이 등록/수정/삭제되었습니다.”).
+  - StoriesController: 스토리 댓글 성공 메시지 추가 및 문장부호 통일.
+  - posts/detail.js·stories/detail.js: 401 안내(“로그인이 필요합니다.”), 버튼 텍스트 “좋아요/좋아요 취소”, 오류 알림 문구 표준화.
+
+- 알림 배너/CSS
+  - style.css: .alert, .alert-success, .alert-error 추가(배경/테두리/텍스트 색상 일관화).
+  - posts/detail.html·stories/detail.html: param.success/param.error 존재 시 상단 알림 배너 노출.
+
+- 기능 명세 확장
+  - FUNCTIONAL_SPECIFICATION.md: Posts/Stories 세부 흐름과 화면 요건, 에디터 툴바, 미디어 리사이즈 UX, 임시 업로드 정리 트리거, 에러 처리 UX 상세 기술.
+
+# v0.0.0.4 - 2025-11-11
+
+추가 및 개선
+- 구분선 삽입 기능 추가(에디터 툴바)
+  - templates/posts/write.html: 툴바에 버튼 #tb-divider 추가
+  - templates/posts/edit.html: 툴바에 버튼 #tb-divider 추가
+  - static/js/posts/write.js: 	bDivider 클릭 시 <hr class="post-divider"> 삽입
+  - static/js/posts/edit.js: 	bDivider 클릭 시 <hr class="post-divider"> 삽입
+
+- 카테고리별 예시 템플릿 삽입(네이버 블로그 템플릿 유사)
+  - templates/posts/write.html: 우측 사이드바에 템플릿 섹션(UI) 추가
+  - templates/posts/edit.html: 동일 UI 추가
+  - static/js/posts/write.js: CATEGORY_TEMPLATES 및 #insertTemplateBtn 핸들러 추가
+  - static/js/posts/edit.js: 동일 로직 적용(비어있으면 대체, 내용 있으면 대체/커서삽입 선택 동작)
+
+- 이미지 좌/중/우 정렬 + 여러 줄 텍스트 흐름 지원
+  - templates/posts/write.html: 에디터 전용 스타일 추가
+    - #livePreview .image-float-left/right/centered (float 기반 배치, 최대폭/여백 지정)
+  - templates/posts/edit.html: 동일 스타일 추가
+  - static/js/posts/write.js: 정렬 버튼 동작 보강
+    - 커서 근처 IMG를 감싸는 wrapper div 생성/재사용, 좌/우는 float으로 텍스트가 옆으로 여러 줄 흐름
+    - 중앙은 float 해제 및 가운데 배치, 캐럿을 wrapper 뒤로 이동(+필요 시 빈 블록 생성)
+  - static/js/posts/edit.js: 동일 동작 적용
+
+- 목록 요약에서 특수 공백 표기 노출 제거
+  - templates/posts/list.html: &nbsp;, &#160;, &#xA0;, 실제 NBSP, &amp;nbsp; 등을 공백으로 정규화 후 요약 생성
+
+# v0.0.0.3 - 2025-11-10
 
 보강 및 버그 수정
 - 미리보기 스크립트 노출 제거: 컨텐츠 요약 생성 시 <script>/<style> 블록까지 제거하도록 서버 로직 보강
@@ -51,3 +99,4 @@
 - stories/list.js: 이미지/비디오 카드에서 썸네일 우선 표시 → hover 시 비디오 미리보기 전환, 최대 5초 재생 후 복원, 충돌 방지 로직 추가
 - templates/stories/list.html: 경로 가드 보강 및 표시 마크업 정리
 - 불필요/중복 코드 제거와 구조 정리로 가독성/유지보수성 개선
+

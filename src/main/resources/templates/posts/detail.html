@@ -113,6 +113,10 @@
 
             <!-- 댓글 영역 -->
             <section class="comments-section">
+                <div th:if="${param.success}" class="alert alert-success" th:text="${param.success}"
+                     style="margin-bottom:12px"></div>
+                <div th:if="${param.error}" class="alert alert-error" th:text="${param.error}"
+                     style="margin-bottom:12px"></div>
                 <h3 class="comments-title">
                     댓글 <span class="comment-count" th:text="${comments != null ? comments.size() : 0}">0</span>
                 </h3>

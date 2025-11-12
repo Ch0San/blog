@@ -1089,6 +1089,28 @@ footer {
   margin-bottom: 20px
 }
 
+/* Alerts */
+.alert {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.alert-success {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.alert-error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
 /* Post detail */
 .post-detail {
   max-width: 800px;

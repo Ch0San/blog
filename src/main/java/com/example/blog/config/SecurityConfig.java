@@ -1,4 +1,4 @@
-package com.example.blog.config;
+﻿package com.example.blog.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,15 +9,17 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.http.HttpStatus;
 
 /**
- * Spring Security 설정 클래스
- * 웹 보안 및 인증/인가 규칙을 정의합니다.
+ * Spring Security ?ㅼ젙 ?대옒??
+ * ??蹂댁븞 諛??몄쬆/?멸? 洹쒖튃???뺤쓽?⑸땲??
  */
 /**
- * Spring Security 설정 클래스.
+ * Spring Security ?ㅼ젙 ?대옒??
  *
- * 접근 제어 규칙, 로그인/로그아웃, remember-me 설정 등을 구성합니다.
+ * ?묎렐 ?쒖뼱 洹쒖튃, 濡쒓렇??濡쒓렇?꾩썐, remember-me ?ㅼ젙 ?깆쓣 援ъ꽦?⑸땲??
  */
 @Configuration
 @EnableWebSecurity
@@ -25,8 +27,8 @@ public class SecurityConfig {
 
         @Bean
         public PasswordEncoder passwordEncoder() {
-                // 평문 비밀번호 사용 (암호화 없음)
-                // 주의: 실제 운영 환경에서는 절대 사용하면 안 됩니다!
+                // ?됰Ц 鍮꾨?踰덊샇 ?ъ슜 (?뷀샇???놁쓬)
+                // 二쇱쓽: ?ㅼ젣 ?댁쁺 ?섍꼍?먯꽌???덈? ?ъ슜?섎㈃ ???⑸땲??
                 return NoOpPasswordEncoder.getInstance();
         }
 
@@ -36,26 +38,26 @@ public class SecurityConfig {
                 http
                                 .userDetailsService(userDetailsService)
                                 .authorizeHttpRequests(auth -> auth
-                                                // 정적 리소스에 대한 접근 허용
+                                                // ?뺤쟻 由ъ냼?ㅼ뿉 ????묎렐 ?덉슜
                                                 .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**",
                                                                 "/uploads/**")
                                                 .permitAll()
-                                                // 홈페이지, 회원가입, 로그인 페이지는 모두 접근 가능
-                                                .requestMatchers("/", "/index.html", "/signup", "/login").permitAll()
-                                                // 공지사항 조회는 모두 접근 가능 (목록/상세)
+                                                // ?덊럹?댁?, ?뚯썝媛?? 濡쒓렇???섏씠吏??紐⑤몢 ?묎렐 媛??
+                                                .requestMatchers("/", "/index.html", "/signup", "/login", "/error", "/401").permitAll()
+                                                // 怨듭??ы빆 議고쉶??紐⑤몢 ?묎렐 媛??(紐⑸줉/?곸꽭)
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/notice",
                                                                 "/notice/",
                                                                 "/notice/*")
                                                 .permitAll()
-                                                // 스토리 조회는 모두 접근 가능 (목록/검색/상세)
+                                                // ?ㅽ넗由?議고쉶??紐⑤몢 ?묎렐 媛??(紐⑸줉/寃???곸꽭)
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/stories",
                                                                 "/stories/",
                                                                 "/stories/*",
                                                                 "/stories/search/**")
                                                 .permitAll()
-                                                // 게시글 조회는 모두 접근 가능 (GET만 허용)
+                                                // 寃뚯떆湲 議고쉶??紐⑤몢 ?묎렐 媛??(GET留??덉슜)
                                                 .requestMatchers(HttpMethod.GET,
                                                                 "/posts",
                                                                 "/posts/",
@@ -66,68 +68,81 @@ public class SecurityConfig {
                                                                 "/posts/download",
                                                                 "/api/posts/**")
                                                 .permitAll()
-                                                // 스토리 작성, 수정, 삭제는 관리자만
+                                                // ?ㅽ넗由??묒꽦, ?섏젙, ??젣??愿由ъ옄留?
                                                 .requestMatchers(
                                                                 "/stories/write",
                                                                 "/stories/edit/**",
                                                                 "/stories/delete/**")
                                                 .hasRole("ADMIN")
-                                                // 회원 관련 - 회원가입과 로그인만 허용, 정보수정/삭제는 인증 필요
+                                                // ?뚯썝 愿??- ?뚯썝媛?낃낵 濡쒓렇?몃쭔 ?덉슜, ?뺣낫?섏젙/??젣???몄쬆 ?꾩슂
                                                 .requestMatchers("/member/signup", "/member/signin").permitAll()
-                                                // 아이디/비밀번호 찾기는 인증 없이 접근 가능
+                                                // ?꾩씠??鍮꾨?踰덊샇 李얘린???몄쬆 ?놁씠 ?묎렐 媛??
                                                 .requestMatchers("/member/find-id", "/member/find-password",
                                                                 "/member/reset-password")
                                                 .permitAll()
                                                 .requestMatchers("/member/update", "/member/delete").authenticated()
-                                                // 회원 목록은 관리자만
+                                                // ?뚯썝 紐⑸줉? 愿由ъ옄留?
                                                 .requestMatchers("/member/list").hasRole("ADMIN")
-                                                // 태그 관리 및 회원 관리(목록/수정/삭제)는 관리자만
+                                                // ?쒓렇 愿由?諛??뚯썝 愿由?紐⑸줉/?섏젙/??젣)??愿由ъ옄留?
                                                 .requestMatchers("/member/tag-update").hasRole("ADMIN")
                                                 .requestMatchers("/member/admin/**").hasRole("ADMIN")
-                                                // 사이트 설정(관리자 전용)
+                                                // ?ъ씠???ㅼ젙(愿由ъ옄 ?꾩슜)
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                                                // 게시글 작성, 수정, 삭제는 관리자만
+                                                // 寃뚯떆湲 ?묒꽦, ?섏젙, ??젣??愿由ъ옄留?
                                                 .requestMatchers(
                                                                 "/posts/write",
                                                                 "/posts/edit/**",
                                                                 "/posts/delete/**")
                                                 .hasRole("ADMIN")
-                                                // 공지사항 작성, 수정, 삭제는 관리자만
+                                                // 怨듭??ы빆 ?묒꽦, ?섏젙, ??젣??愿由ъ옄留?
                                                 .requestMatchers(
                                                                 "/notice/write",
                                                                 "/notice/edit/**",
                                                                 "/notice/delete/**")
                                                 .hasRole("ADMIN")
-                                                // 에디터 내 업로드 API는 관리자만 허용
+                                                // ?먮뵒?????낅줈??API??愿由ъ옄留??덉슜
                                                 .requestMatchers(HttpMethod.POST, "/api/uploads/**").hasRole("ADMIN")
-                                                // 댓글 작성/삭제는 인증된 사용자만
+                                                // ?볤? ?묒꽦/??젣???몄쬆???ъ슜?먮쭔
                                                 .requestMatchers(HttpMethod.POST, "/posts/*/comments",
                                                                 "/comments/*/delete")
                                                 .authenticated()
-                                                // 게시글 좋아요는 인증된 사용자만
+                                                // 寃뚯떆湲 醫뗭븘?붾뒗 ?몄쬆???ъ슜?먮쭔
                                                 .requestMatchers(HttpMethod.POST, "/posts/*/like").authenticated()
-                                                // 댓글/답글 작성은 인증 사용자 허용 (엔드포인트가 있을 경우)
+                                                // ?볤?/?듦? ?묒꽦? ?몄쬆 ?ъ슜???덉슜 (?붾뱶?ъ씤?멸? ?덉쓣 寃쎌슦)
                                                 .requestMatchers(HttpMethod.POST, "/comments/**", "/replies/**")
                                                 .authenticated()
-                                                // 나머지 요청은 인증 필요
+                                                // ?섎㉧吏 ?붿껌? ?몄쬆 ?꾩슂
                                                 .anyRequest().authenticated())
+                                .exceptionHandling(ex -> ex
+                                                .defaultAuthenticationEntryPointFor(
+                                                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                                                    new org.springframework.security.web.util.matcher.OrRequestMatcher(
+                                                        new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/**"),
+                                                        new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/posts/*/like"),
+                                                        new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/comments/*/like"),
+                                                        new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/stories/*/like"),
+                                                        new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/stories/comments/*/like"),
+                                                        new org.springframework.security.web.util.matcher.RequestHeaderRequestMatcher("X-Requested-With", "XMLHttpRequest")
+                                                    )
+                                                ))
                                 .formLogin(form -> form
-                                                .loginPage("/member/signin") // 커스텀 로그인 페이지
-                                                .loginProcessingUrl("/member/signin") // 로그인 처리 URL
-                                                .defaultSuccessUrl("/", true) // 로그인 성공 시 이동할 페이지
-                                                .failureUrl("/member/signin?error") // 로그인 실패 시 이동할 페이지
+                                                .loginPage("/member/signin") // 而ㅼ뒪? 濡쒓렇???섏씠吏
+                                                .loginProcessingUrl("/member/signin") // 濡쒓렇??泥섎━ URL
+                                                .defaultSuccessUrl("/", true) // 濡쒓렇???깃났 ???대룞???섏씠吏
+                                                .failureUrl("/member/signin?error") // 濡쒓렇???ㅽ뙣 ???대룞???섏씠吏
                                                 .permitAll())
                                 .rememberMe(remember -> remember
                                                 .key("blog-remember-me-key")
-                                                .tokenValiditySeconds(60 * 60 * 24 * 14) // 14일
+                                                .tokenValiditySeconds(60 * 60 * 24 * 14) // 14??
                                                 .userDetailsService(userDetailsService))
                                 .logout(logout -> logout
-                                                .logoutUrl("/member/signout") // 로그아웃 URL
-                                                .logoutSuccessUrl("/?logout") // 로그아웃 성공 시 이동할 페이지
+                                                .logoutUrl("/member/signout") // 濡쒓렇?꾩썐 URL
+                                                .logoutSuccessUrl("/?logout") // 濡쒓렇?꾩썐 ?깃났 ???대룞???섏씠吏
                                                 .permitAll());
 
                 return http.build();
         }
 
-        // UserDetailsService는 CustomUserDetailsService(@Service) 빈이 자동 주입됩니다.
+        // UserDetailsService??CustomUserDetailsService(@Service) 鍮덉씠 ?먮룞 二쇱엯?⑸땲??
 }
+

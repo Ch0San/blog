@@ -140,7 +140,17 @@
                 style="color:var(--text);text-decoration:none">제목</a>
             </h4>
             <p style="margin:0;color:var(--muted);font-size:14px;line-height:1.5"
-              th:text="${#strings.length(post.content) > 80 ? #strings.substring(post.content, 0, 80) + '...' : post.content}">
+              th:with="
+                s1=${#strings.replace(post.content,'&nbsp;',' ')},
+                s2=${#strings.replace(s1,'&#160;',' ')},
+                s3=${#strings.replace(s2,'&#xA0;',' ')},
+                s4=${#strings.replace(s3,'?',' ')},
+                s5=${#strings.replace(s4,'&amp;nbsp;',' ')},
+                s6=${#strings.replace(s5,'  ',' ')},
+                s7=${#strings.replace(s6,'  ',' ')},
+                clean=${#strings.trim(s7)}
+              "
+              th:text="${#strings.length(clean) > 80 ? #strings.substring(clean, 0, 80) + '...' : clean}">
               내용 미리보기
             </p>
             <div class="meta">
@@ -184,7 +194,17 @@
                 style="color:var(--text);text-decoration:none">제목</a>
             </h4>
             <p style="margin:0;color:var(--muted);font-size:14px;line-height:1.5"
-              th:text="${#strings.length(post.content) > 80 ? #strings.substring(post.content, 0, 80) + '...' : post.content}">
+              th:with="
+                s1=${#strings.replace(post.content,'&nbsp;',' ')},
+                s2=${#strings.replace(s1,'&#160;',' ')},
+                s3=${#strings.replace(s2,'&#xA0;',' ')},
+                s4=${#strings.replace(s3,'?',' ')},
+                s5=${#strings.replace(s4,'&amp;nbsp;',' ')},
+                s6=${#strings.replace(s5,'  ',' ')},
+                s7=${#strings.replace(s6,'  ',' ')},
+                clean=${#strings.trim(s7)}
+              "
+              th:text="${#strings.length(clean) > 80 ? #strings.substring(clean, 0, 80) + '...' : clean}">
               내용 미리보기
             </p>
             <div class="meta">

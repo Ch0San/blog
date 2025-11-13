@@ -9,13 +9,9 @@
     <!-- 공통 헤더 프래그먼트 -->
     <header th:fragment="header(currentPage)">
         <div class="container topbar">
-            <a href="/" class="logo">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="24" height="24" rx="6" fill="var(--accent)" />
-                    <path d="M7 12h10" stroke="#fff" stroke-width="1.5" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                </svg>
-                내 이야기
+                        <a href="/" class="logo" style="display:flex;align-items:center;gap:10px">
+                <img th:src="@{/images/blog_project_icon.png}" src="/images/blog_project_icon.png" alt="블로그 로고" style="width:34px;height:34px;object-fit:cover;border-radius:6px" />
+                내 이야기
             </a>
             <nav>
                 <div class="dropdown">

@@ -100,10 +100,10 @@
               </div>
             </div>
             <ul class="notice-list">
-              <li class="notice-item" th:each="n : ${recentNotices}">
+              <li class="notice-item" th:each="n : ${recentNotices}" th:with="lastDate=${n.updatedAt != null ? n.updatedAt : n.createdAt}">
                 <span class="notice-dot"></span>
                 <a th:href="@{'/notice/' + ${n.id}}" th:text="${n.title}" class="notice-title">공지 제목</a>
-                <span th:text="${#temporals.format(n.createdAt, 'MM.dd')}" class="notice-date">10.29</span>
+                <span th:text="${#temporals.format(lastDate, 'MM.dd')}" class="notice-date">10.29</span>
               </li>
               <li th:if="${#lists.isEmpty(recentNotices)}" class="notice-empty">
                 등록된 공지사항이 없습니다.

@@ -37,11 +37,12 @@
 			<p>등록된 공지사항이 없습니다.</p>
 		</div>
 
-		<div th:each="n : ${notices}" class="post-item" style="display:flex;gap:20px;align-items:flex-start">
+		<div th:each="n : ${notices}" th:with="lastDate=${n.updatedAt != null ? n.updatedAt : n.createdAt}"
+			class="post-item" style="display:flex;gap:20px;align-items:flex-start">
 			<div style="flex:1">
 				<div class="title"><a th:href="@{'/notice/' + ${n.id}}" th:text="${n.title}">공지 제목</a></div>
 				<div class="meta"><span th:text="${n.author}">관리자</span> · <span
-						th:text="${#temporals.format(n.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span> · 조회 <span
+						th:text="${#temporals.format(lastDate, 'yyyy-MM-dd HH:mm')}">날짜</span> · 조회 <span
 						th:text="${n.viewCount}">0</span></div>
 				<div class="excerpt"
 					th:text="${#strings.length(n.content) > 160 ? #strings.substring(n.content, 0, 160) + '...' : n.content}">

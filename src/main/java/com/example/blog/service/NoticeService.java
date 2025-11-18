@@ -4,7 +4,6 @@ import com.example.blog.domain.Notice;
 import com.example.blog.repository.NoticeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +30,7 @@ public class NoticeService {
      * @return 공지사항 페이지(최신 생성일 내림차순)
      */
     public Page<Notice> getNotices(int page, int size) {
-        return noticeRepository
-                .findAllByOrderByCreatedAtDesc(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
+        return noticeRepository.findAllByLatestDateDesc(PageRequest.of(page, size));
     }
 
     /**
@@ -109,7 +107,6 @@ public class NoticeService {
      * @return 공지사항 목록
      */
     public List<Notice> getRecentNotices(int limit) {
-        return noticeRepository.findAll(PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdAt")))
-                .getContent();
+        return noticeRepository.findAllByLatestDateDesc(PageRequest.of(0, limit)).getContent();
     }
 }

@@ -151,9 +151,9 @@ public class AdminSiteController {
                 return "redirect:/admin/site/hero-image?error=forbidden";
             }
             // 현재 사용중 이미지면 기본값으로 되돌림
-            String currentUrl = siteSettingService.getSetting("site_hero_image_url", "/images/index_image.jpg");
+            String currentUrl = siteSettingService.getSetting("site_hero_image_url", "/images/index_image.png");
             if (trimmed.equals(currentUrl)) {
-                siteSettingService.saveSetting("site_hero_image_url", "/images/index_image.jpg",
+                siteSettingService.saveSetting("site_hero_image_url", "/images/index_image.png",
                         "Index hero image URL");
             }
             Files.deleteIfExists(target);

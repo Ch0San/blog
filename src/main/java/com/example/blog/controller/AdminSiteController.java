@@ -43,7 +43,7 @@ public class AdminSiteController {
      */
     @GetMapping("/hero-image")
     public String heroImageEditPage(Model model) {
-        String currentUrl = siteSettingService.getSetting("site_hero_image_url", "/images/index_image.jpg");
+        String currentUrl = siteSettingService.getSetting("site_hero_image_url", "/images/index_image.png");
         model.addAttribute("heroImageUrl", currentUrl);
 
         // 과거 hero 이미지 목록 수집 (uploads/images/hero_*.{ext})

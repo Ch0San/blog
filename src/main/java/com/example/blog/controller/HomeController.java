@@ -125,7 +125,7 @@ public class HomeController {
                 "안녕하세요! 👋\n초보 개발자입니다.\n개발 공부하면서 배운 내용과\n일상, 여행 이야기를 기록합니다."));
         // 히어로 이미지 URL (관리자가 업로드로 변경 가능, 기본값은 정적 이미지)
         model.addAttribute("heroImageUrl",
-                siteSettingService.getSetting("site_hero_image_url", "/images/index_image.jpg"));
+                siteSettingService.getSetting("site_hero_image_url", "/images/index_image.png"));
 
         return "index";
     }

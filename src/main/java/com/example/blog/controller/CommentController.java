@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * 댓글 컨트롤러.
- * 게시글의 댓글 생성/수정/삭제를 처리합니다.
+ * Comment controller.
+ * Handles create/update/delete for post comments.
  */
 @Controller
 public class CommentController {
@@ -20,46 +20,37 @@ public class CommentController {
     }
 
     /**
-     * 댓글 생성(인증 필요).
-     * 
-     * @param postId         게시글 ID
-     * @param content        댓글 내용
-     * @param authentication 인증 정보(작성자 식별)
-     * @return 게시글 상세로 리다이렉트
+     * Create comment (auth required).
      */
     @PostMapping("/posts/{postId}/comments")
     public String createComment(
             @PathVariable Long postId,
             @RequestParam String content,
             Authentication authentication) {
-        String username = authentication.getName();
-        commentService.createComment(postId, content, username);
-        return "redirect:/posts/" + postId + "?success=댓글이 등록되었습니다.";
+        String username = authentication != null ? authentication.getName() : null;
+        try {
+            commentService.createComment(postId, content, username);
+            return "redirect:/posts/" + postId + "?success=\uB313\uAE00\uC774 \uB4F1\uB85D\uB418\uC5C8\uC2B5\uB2C8\uB2E4.";
+        } catch (IllegalArgumentException e) {
+            return "redirect:/posts/" + postId + "?error=" + e.getMessage();
+        } catch (Exception e) {
+            return "redirect:/posts/" + postId + "?error=\uB313\uAE00 \uC791\uC131 \uC911 \uC624\uB958\uAC00 \uBC1C\uC0DD\uD588\uC2B5\uB2C8\uB2E4.";
+        }
     }
 
     /**
-     * 댓글 삭제(인증 필요).
-     * 
-     * @param commentId 댓글 ID
-     * @param postId    소속 게시글 ID
-     * @return 게시글 상세로 리다이렉트
+     * Delete comment (auth required).
      */
     @PostMapping("/comments/{commentId}/delete")
     public String deleteComment(
             @PathVariable Long commentId,
             @RequestParam Long postId) {
         commentService.deleteComment(commentId);
-        return "redirect:/posts/" + postId + "?success=댓글이 삭제되었습니다.";
+        return "redirect:/posts/" + postId + "?success=\uB313\uAE00\uC774 \uC0AD\uC81C\uB418\uC5C8\uC2B5\uB2C8\uB2E4.";
     }
 
     /**
-     * 댓글 수정(인증 필요). 작성자 본인만 수정 가능합니다.
-     * 
-     * @param commentId      댓글 ID
-     * @param postId         소속 게시글 ID
-     * @param content        변경할 내용
-     * @param authentication 인증 정보(작성자 확인)
-     * @return 게시글 상세로 리다이렉트(실패 시 오류 메시지 쿼리 포함)
+     * Update comment (auth required). Only author can update.
      */
     @PostMapping("/comments/{commentId}/update")
     public String updateComment(
@@ -67,12 +58,12 @@ public class CommentController {
             @RequestParam Long postId,
             @RequestParam String content,
             Authentication authentication) {
-        String username = authentication.getName();
+        String username = authentication != null ? authentication.getName() : null;
         try {
             commentService.updateComment(commentId, content, username);
         } catch (IllegalArgumentException e) {
             return "redirect:/posts/" + postId + "?error=" + e.getMessage();
         }
-        return "redirect:/posts/" + postId + "?success=댓글이 수정되었습니다.";
+        return "redirect:/posts/" + postId + "?success=\uB313\uAE00\uC774 \uC218\uC815\uB418\uC5C8\uC2B5\uB2C8\uB2E4.";
     }
 }
